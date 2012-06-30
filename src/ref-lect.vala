@@ -19,8 +19,6 @@
 
 using GLib;
 
-MirrorServer mirror;
-
 [DBus (name = "org.rfid.Mirror")]
 public class MirrorServer : Object {
 
@@ -34,12 +32,14 @@ public class MirrorServer : Object {
         // TODO
     }
 
-    public signal void tagEnter (uint64 tag);
-    public signal void tagLeave (uint64 tag);
+    public signal void tagEnter (string tag);
+    public signal void tagLeave (string tag);
     public signal void flipUp ();
     public signal void flipDown ();
 
 }
+
+MirrorServer mirror;
 
 void on_bus_aquired (DBusConnection conn) {
     try {
@@ -55,9 +55,10 @@ async void read_async (MirrorDevice dev)
 		while (true)
 		{
 			// FIXME break loop cleanly
-			uint64 tag;
-			uint16 event = yield dev.read_event (out tag);
-
+			string tag;
+			uint16 event = dev.read_event (out tag);
+			if (event != Event.EMPTY)
+			stdout.printf ("DEBUG: event: %d %04X\n", event, event);
 			switch(event)
 			{
 				case Event.UP:
@@ -69,11 +70,11 @@ async void read_async (MirrorDevice dev)
 					mirror.flipDown();
 					break;
 				case Event.ENTER:
-					stdout.printf ("DEBUG: tag entered\n");
+					stdout.printf ("DEBUG: tag entered: %s\n", tag);
 					mirror.tagEnter(tag);
 					break;
 				case Event.LEAVE:
-					stdout.printf ("DEBUG: tag left\n");
+					stdout.printf ("DEBUG: tag left: %s\n", tag);
 					mirror.tagLeave(tag);
 					break;
 				default:

@@ -68,15 +68,25 @@ public class MirrorDevice : Object
 		dis.set_byte_order (DataStreamByteOrder.LITTLE_ENDIAN);
 	}
 
-	public async uint16 read_event (out uint64 tag) throws IOError
+	public uint16 read_event (out string tag) throws IOError
 	{
-		uint16 event = dis.read_int16 ();
+		uint8[] event_bytes = new uint8[2];
+		dis.read (event_bytes);
+		// FIXME read_uint16 corrupt next reads
+		uint16 event = (event_bytes[1] << 8) + event_bytes[0];
 
 		if(event != Event.EMPTY)
 		{
-			dis.read_int16 ();
-			tag = dis.read_uint64 (); 
-			dis.read_int16 ();
+			var buf = new StringBuilder();
+			dis.skip (2);
+			uint8[] tag_bytes = new uint8[2*5];
+			dis.read (tag_bytes);
+			foreach (uint8 cur in tag_bytes)
+			{
+				buf.append("%02X".printf(cur));
+			}
+			tag = buf.str; 
+			dis.skip (2);
 		}
 
 		return event;
