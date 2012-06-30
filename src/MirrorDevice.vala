@@ -37,7 +37,6 @@ public class MirrorDevice : Object
 	
 	public static string detect_mirror ()
 	{
-		int fd;
 		int i;
 		string device = null;
 		var devices = Glob();
