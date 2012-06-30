@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <linux/hiddev.h>
 #include <errno.h>
+#include <string.h>
 
 #define HIDIOCGRAWINFO          _IOR('H', 0x03, struct hidraw_devinfo)
 
