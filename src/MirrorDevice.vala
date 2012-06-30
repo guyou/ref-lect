@@ -67,7 +67,7 @@ public class MirrorDevice : Object
 		dis.set_byte_order (DataStreamByteOrder.LITTLE_ENDIAN);
 	}
 
-	public uint16 read_event (out string tag) throws IOError
+	public async uint16 read_event (out string tag) throws IOError
 	{
 		uint8[] event_bytes = new uint8[2];
 		dis.read (event_bytes);

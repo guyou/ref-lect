@@ -56,7 +56,7 @@ async void read_async (MirrorDevice dev)
 		{
 			// FIXME break loop cleanly
 			string tag;
-			uint16 event = dev.read_event (out tag);
+			uint16 event = yield dev.read_event (out tag);
 			if (event != Event.EMPTY)
 			stdout.printf ("DEBUG: event: %d %04X\n", event, event);
 			switch(event)
@@ -94,7 +94,7 @@ public class Main : Object
 		mirror = new MirrorServer ();
 	    Bus.own_name (BusType.SESSION, "org.rfid.Mirror", BusNameOwnerFlags.NONE,
               on_bus_aquired,
-              () => {},
+              () => stdout.printf ("DEBUG: Name aquired\n"),
               () => stderr.printf ("Could not aquire name\n"));
 
 		string device = MirrorDevice.detect_mirror ();
