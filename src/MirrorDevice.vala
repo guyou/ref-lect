@@ -77,14 +77,14 @@ public class MirrorDevice : Object
 		var buf = new StringBuilder();
 		if(event != Event.EMPTY)
 		{
-			dis.skip (2);
-			uint8[] tag_bytes = new uint8[2*5];
+			dis.skip (3);
+			uint8[] tag_bytes = new uint8[2*4];
 			dis.read (tag_bytes);
 			foreach (uint8 cur in tag_bytes)
 			{
 				buf.append("%02X".printf(cur));
 			}
-			dis.skip (2);
+			dis.skip (3);
 		}
 		tag = buf.str; 
 
