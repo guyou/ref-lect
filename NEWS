@@ -1,2 +1,8 @@
+ref-lect 0.2 (2012-07-01)
+* Add command line processing
+* Add tools to check the DBus interface
+* Fix tag reading based on experiment with Nabaztag
+* Convert tag as string in interface
+
 ref-lect 0.1 (2012-06-25)
 First release
