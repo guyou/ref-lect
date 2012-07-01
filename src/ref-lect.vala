@@ -18,14 +18,15 @@
  */
 
 using GLib;
+using Gee;
 
 [DBus (name = "org.rfid.Mirror")]
 public class MirrorServer : Object {
 
-    private uint16 state = Event.UP;
-	private string[] tagList;	
+	private uint16 state = Event.UP;
+	private HashSet<string> tagList = new HashSet<string> ();	
 
-    public string getState () {
+	public string getState () {
         switch(state)
 		{
 			case Event.UP:
@@ -38,7 +39,7 @@ public class MirrorServer : Object {
     }
 
     public string[] getTags () {
-        return tagList;
+        return tagList.to_array ();
     }
 
     public signal void tagEnter (string tag);
@@ -62,12 +63,12 @@ public class MirrorServer : Object {
 				break;
 			case Event.ENTER:
 				stdout.printf ("DEBUG: tag entered: %s\n", tag);
-				tagList += tag;
+				tagList.add (tag);
 				this.tagEnter (tag);
 				break;
 			case Event.LEAVE:
 				stdout.printf ("DEBUG: tag left: %s\n", tag);
-				// tagList.remove (tag);
+				tagList.remove (tag);
 				this.tagLeave (tag);
 				break;
 			default:

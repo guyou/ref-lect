@@ -20,7 +20,7 @@ ref_lect_SOURCES = \
 	ref-lect.vala config.vapi MirrorDevice.vala mir-ror.c mir-ror.vapi
 
 ref_lect_VALAFLAGS =  \
-	--pkg gio-2.0 --pkg posix
+	--pkg gio-2.0 --pkg gee-1.0 --pkg posix
 
 ref_lect_LDFLAGS = \
 	-Wl,--export-dynamic

@@ -19,7 +19,10 @@ dnl Check for vala
 AM_PROG_VALAC([0.10.0])
 
 
-PKG_CHECK_MODULES(REF_LECT, [gio-2.0 ])
+PKG_CHECK_MODULES(REF_LECT, [
+	gio-2.0
+	gee-1.0
+])
 
 
 AC_OUTPUT([
