@@ -106,14 +106,58 @@ async void read_async (MirrorDevice dev)
 
 public class Main : Object 
 {
+	public static bool quit = false;
+	public static bool session = false;
+	public static bool system = false;
+
+	public static const OptionEntry[] entries = {
+		{"version", 'v', OptionFlags.NO_ARG, OptionArg.CALLBACK,
+			(void *)show_version_and_quit, N_("Show the application's version"), null},
+		{"system", 0, 0, OptionArg.NONE,
+			ref system, N_("Use system message bus."), null},
+		{"session", 0, 0, OptionArg.NONE,
+			ref session, N_("Use session message bus."), null},
+		{null}
+	};
+
+	private static void show_version_and_quit()
+	{
+		stdout.printf("%s %s\n",
+		              Environment.get_application_name(),
+		              Config.VERSION);
+
+		quit = true;
+	}
+
+	private static void parse_command_line(ref unowned string[] argv) throws OptionError
+	{
+		var ctx = new OptionContext(_("- Mir:ror userspace driver"));
+
+		ctx.add_main_entries(entries, Config.GETTEXT_PACKAGE);
+
+		ctx.parse(ref argv);
+	}
+
 
 	static int main (string[] args) 
 	{
+		parse_command_line(ref args);
+
+		if (quit)
+			return 0;
+		
 		mirror = new MirrorServer ();
-	    Bus.own_name (BusType.SESSION, "org.rfid.Mirror", BusNameOwnerFlags.NONE,
-              on_bus_aquired,
-              () => stdout.printf ("DEBUG: Name aquired\n"),
-              () => stderr.printf ("Could not aquire name\n"));
+		BusType busType;
+		if (session && !system)
+			busType = BusType.SESSION;
+		else if (!session && system)
+			busType = BusType.SYSTEM;
+		else
+			busType = BusType.SYSTEM;
+		Bus.own_name (busType, "org.rfid.Mirror", BusNameOwnerFlags.NONE,
+		              on_bus_aquired,
+		              () => stdout.printf ("DEBUG: Name aquired\n"),
+		              () => stderr.printf ("Could not aquire name\n"));
 
 		string device = MirrorDevice.detect_mirror ();
 		stdout.printf ("DEBUG: Device found %s\n", device);
