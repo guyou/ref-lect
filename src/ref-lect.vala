@@ -22,14 +22,23 @@ using GLib;
 [DBus (name = "org.rfid.Mirror")]
 public class MirrorServer : Object {
 
-    private int counter;
+    private uint16 state = Event.UP;
+	private string[] tagList;	
 
-    public void getState () {
-        // TODO
+    public string getState () {
+        switch(state)
+		{
+			case Event.UP:
+				return "UP";
+			case Event.DOWN:
+				return "DOWN";
+			default:
+				return "UNKNOWN";
+		}
     }
 
-    public void getTags () {
-        // TODO
+    public string[] getTags () {
+        return tagList;
     }
 
     public signal void tagEnter (string tag);
@@ -43,19 +52,23 @@ public class MirrorServer : Object {
 		{
 			case Event.UP:
 				stdout.printf ("DEBUG: mirror flipped up\n");
-				this.flipUp();
+				state = Event.UP;
+				this.flipUp ();
 				break;
 			case Event.DOWN:
 				stdout.printf ("DEBUG: mirror flipped down\n");
-				this.flipDown();
+				state = Event.DOWN;
+				this.flipDown ();
 				break;
 			case Event.ENTER:
 				stdout.printf ("DEBUG: tag entered: %s\n", tag);
-				this.tagEnter(tag);
+				tagList += tag;
+				this.tagEnter (tag);
 				break;
 			case Event.LEAVE:
 				stdout.printf ("DEBUG: tag left: %s\n", tag);
-				this.tagLeave(tag);
+				// tagList.remove (tag);
+				this.tagLeave (tag);
 				break;
 			default:
 				break;
