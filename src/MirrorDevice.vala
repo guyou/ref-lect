@@ -74,9 +74,9 @@ public class MirrorDevice : Object
 		// FIXME read_uint16 corrupt next reads
 		uint16 event = (event_bytes[1] << 8) + event_bytes[0];
 
+		var buf = new StringBuilder();
 		if(event != Event.EMPTY)
 		{
-			var buf = new StringBuilder();
 			dis.skip (2);
 			uint8[] tag_bytes = new uint8[2*5];
 			dis.read (tag_bytes);
@@ -84,9 +84,9 @@ public class MirrorDevice : Object
 			{
 				buf.append("%02X".printf(cur));
 			}
-			tag = buf.str; 
 			dis.skip (2);
 		}
+		tag = buf.str; 
 
 		return event;
 	}

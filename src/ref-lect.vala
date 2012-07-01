@@ -37,6 +37,30 @@ public class MirrorServer : Object {
     public signal void flipUp ();
     public signal void flipDown ();
 
+	[DBus (visible = false)]
+	public void processEvent (uint16 event, ref string tag) {
+		switch(event)
+		{
+			case Event.UP:
+				stdout.printf ("DEBUG: mirror flipped up\n");
+				this.flipUp();
+				break;
+			case Event.DOWN:
+				stdout.printf ("DEBUG: mirror flipped down\n");
+				this.flipDown();
+				break;
+			case Event.ENTER:
+				stdout.printf ("DEBUG: tag entered: %s\n", tag);
+				this.tagEnter(tag);
+				break;
+			case Event.LEAVE:
+				stdout.printf ("DEBUG: tag left: %s\n", tag);
+				this.tagLeave(tag);
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 MirrorServer mirror;
@@ -55,31 +79,11 @@ async void read_async (MirrorDevice dev)
 		while (true)
 		{
 			// FIXME break loop cleanly
-			string tag;
+			string tag = "";
 			uint16 event = yield dev.read_event (out tag);
 			if (event != Event.EMPTY)
 			stdout.printf ("DEBUG: event: %d %04X\n", event, event);
-			switch(event)
-			{
-				case Event.UP:
-					stdout.printf ("DEBUG: mirror flipped up\n");
-					mirror.flipUp();
-					break;
-				case Event.DOWN:
-					stdout.printf ("DEBUG: mirror flipped down\n");
-					mirror.flipDown();
-					break;
-				case Event.ENTER:
-					stdout.printf ("DEBUG: tag entered: %s\n", tag);
-					mirror.tagEnter(tag);
-					break;
-				case Event.LEAVE:
-					stdout.printf ("DEBUG: tag left: %s\n", tag);
-					mirror.tagLeave(tag);
-					break;
-				default:
-					break;
-			}
+			mirror.processEvent (event, ref tag);
 		}
     } catch (Error e) {
         error (e.message);
