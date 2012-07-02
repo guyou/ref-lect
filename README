@@ -6,5 +6,6 @@ The D-Bus API also allow to request the current status of the Mir:ror (UP/DOWN) 
 Usage
 =====
 
-See ref-lect(1) man page for detailled information.
+See ref-lect(1) man page for detailled information about the daemon.
 
+In tools/ directory, you will find some useful examples of clients to play with the daemon.

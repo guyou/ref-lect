@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ## Created by Anjuta
 
-SUBDIRS = src data
+SUBDIRS = src data tools
 
 ref_lectdocdir = ${prefix}/doc/ref-lect
 ref_lectdoc_DATA = \
