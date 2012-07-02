@@ -15,3 +15,5 @@ EXTRA_DIST = \
 	$(dbussystem_DATA) \
 	org.rfid.Mirror.service.in
 
+DISTCLEANFILES = \
+	org.rfid.Mirror.service
