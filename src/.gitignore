@@ -1,0 +1,7 @@
+.deps/
+Makefile
+Makefile.in
+MirrorDevice.c
+ref-lect
+ref-lect.c
+ref_lect_vala.stamp
