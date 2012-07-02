@@ -42,6 +42,10 @@ public class MirrorServer : Object {
         return tagList.to_array ();
     }
 
+    public void resetAll () {
+        tagList.clear ();
+    }
+
     public signal void tagEnter (string tag);
     public signal void tagLeave (string tag);
     public signal void flipUp ();
