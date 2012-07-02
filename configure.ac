@@ -31,5 +31,6 @@ PKG_CHECK_MODULES(REF_LECT, [
 AC_OUTPUT([
 Makefile
 src/Makefile
+data/Makefile
 
 ])

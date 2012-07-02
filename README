@@ -1,1 +1,10 @@
 A D-Bus version of erawrim, a driver for Mir:ror from Violet.
+
+All Mir:ror events are translated as D-Bus signals. Many clients can connect and react.
+The D-Bus API also allow to request the current status of the Mir:ror (UP/DOWN) and the tags currently visible by the Mir:ror.
+
+Usage
+=====
+
+See ref-lect(1) man page for detailled information.
+

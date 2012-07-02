@@ -1,0 +1,51 @@
+.TH REF_LECT 1 "02 Jui 2012"
+.SH NAME
+ref\-lect\fP \- Mir:ror userspace driver (D-Bus service)
+
+.SH SYNOPSIS
+.B ref\-lect
+.RI [options]
+.SH DESCRIPTION
+.B ref\-lect
+is a userspace driver for the
+.B Mir:ror
+RFID USB device.
+It translates all events (RFID tag in and out, device flipped
+up or down).
+.P
+This program must be run by a user with reading permissions on /dev/hidraw*.
+.P
+Running
+.B ref-lect
+without any argument, will automatically detect the right device to use and
+will also try to connect to system D-Bus message bus.
+.P
+This program is a service and is not normally run directly by user.
+It should be started by 
+.B init
+or by 
+.B dbus\-daemon
+via service description.
+.SH OPTIONS
+.B --system
+Attach 
+.B ref\-lect 
+to the system message bus
+
+.B --session
+Attach 
+.B ref\-lect 
+to the user's session message bus
+
+.B \-?,--help
+Show the help message
+
+.SH FILES
+.B /dev/hidraw*
+the devices checked for 
+.B Mir:ror
+attached device
+
+.SH AUTHORS
+Guilhem Bonnefille  <guilhem.bonnefille@gmail.com>
+
