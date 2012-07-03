@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# script d'initialisation d'erawrim
+# c'est ce script qui doit être lancé par l'utilisateur
+
+ERAWRIM_PATH=~/.erawrim
+DEVICE=""
+ANNUAIRE=$ERAWRIM_PATH/annuaire
+LOG=$ERAWRIM_PATH/log
+
+
+log ()
+{
+  echo "$(date);$1" >> $LOG
+}
+
+prepare_home ()
+{
+  if [ ! -e $ERAWRIM_PATH ]
+  then 
+    mkdir $ERAWRIM_PATH
+    #ce fichier précise l'état du mirror
+    echo endroit > $ERAWRIM_PATH/etat_mirror
+    
+    #ce fichier associe un identifiant de tag à un nom
+    touch $ANNUAIRE
+    touch $LOG
+    
+    #ce dossier contient la liste des ztamps posés à un instant t
+    if [ ! -e $ERAWRIM_PATH/ztamps ]; then mkdir $ERAWRIM_PATH/ztamps; fi;
+    
+    if [ ! -e $ERAWRIM_PATH/endroit.sh ]; then echo "#!/bin/bash" > $ERAWRIM_PATH/endroit.sh; fi;
+    if [ ! -e $ERAWRIM_PATH/envers.sh ]; then echo "#!/bin/bash" > $ERAWRIM_PATH/envers.sh; fi;
+    
+    chmod +x $ERAWRIM_PATH/endroit.sh $ERAWRIM_PATH/envers.sh
+  fi
+}
+
+associe_tag_nom ()
+{
+  ZTAMP_NAME=$(cat $ERAWRIM_PATH/annuaire | grep ^$1 | cut -d ':' -f 2)
+}
+
+add ()
+{
+  associe_tag_nom $1
+  if [ -z $ZTAMP_NAME ]	#ztamp inconnu
+  then
+    until [ ! -z $ZTAMP_NAME ]; do
+      #choisir l'un ou l'autre
+      read -p "Ce ztamp est inconnu, veuillez le nommer:" ZTAMP_NAME
+#      ZTAMP_NAME=$(Xdialog --stdout --inputbox "Ce ztamp est inconnu, veuillez le nommer:" 0 0)
+    done
+    echo $1:$ZTAMP_NAME >> $ERAWRIM_PATH/annuaire
+    mkdir $ERAWRIM_PATH/$ZTAMP_NAME
+    
+    echo "#!/bin/bash" > $ERAWRIM_PATH/$ZTAMP_NAME/pose.sh
+    chmod +x $ERAWRIM_PATH/$ZTAMP_NAME/pose.sh
+    echo "#!/bin/bash" > $ERAWRIM_PATH/$ZTAMP_NAME/retire.sh
+    chmod +x $ERAWRIM_PATH/$ZTAMP_NAME/retire.sh
+    touch $ERAWRIM_PATH/$ZTAMP_NAME/lasttime
+    touch $ERAWRIM_PATH/$ZTAMP_NAME/times
+    
+    echo 0 > $ERAWRIM_PATH/$ZTAMP_NAME/times
+    date > $ERAWRIM_PATH/$ZTAMP_NAME/lasttime
+    
+    touch $ERAWRIM_PATH/ztamps/$ZTAMP_NAME
+  fi
+}
+
+remove ()
+{
+  #associe_tag_nom $1
+  cat $ANNUAIRE  | grep $1$
+  if (( !$? ))
+  then
+    ZTAMP_NAME=$1
+    rm -r $ERAWRIM_PATH/$ZTAMP_NAME
+    cat $ANNUAIRE  | grep $ZTAMP_NAME$ > /tmp/remove_ztamp
+    diff /tmp/remove_ztamp $ANNUAIRE  | cut -d ' ' -f 2 | tail -n $(($(diff /tmp/remove_ztamp $ANNUAIRE | wc -l) - 1)) > $ANNUAIRE
+    rm /tmp/remove_ztamp
+    log "$ZTAMP_NAME a été supprimé."
+  else
+    log "$1 n'existe pas."
+  fi
+}
+
+prepare_home
+
+case $1 in
+  "add" ) add $2;;
+  "remove" ) remove $2;;
+  * ) echo impossible;;
+esac

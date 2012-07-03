@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# script d'initialisation d'erawrim
+# c'est ce script qui doit être lancé par l'utilisateur
+
+ERAWRIM_PATH=~/.erawrim
+DEVICE=""
+ANNUAIRE=$ERAWRIM_PATH/annuaire
+LOG=$ERAWRIM_PATH/log
+
+
+log ()
+{
+  echo "$(date);$1" >> $LOG
+}
+
+prepare_home ()
+{
+  if [ ! -e $ERAWRIM_PATH ]
+  then 
+    mkdir $ERAWRIM_PATH
+    #ce fichier précise l'état du mirror
+    echo endroit > $ERAWRIM_PATH/etat_mirror
+    
+    #ce fichier associe un identifiant de tag à un nom
+    touch $ANNUAIRE
+    touch $LOG
+    
+    #ce dossier contient la liste des ztamps posés à un instant t
+    if [ ! -e $ERAWRIM_PATH/ztamps ]; then mkdir $ERAWRIM_PATH/ztamps; fi;
+    
+    if [ ! -e $ERAWRIM_PATH/endroit.sh ]; then echo "#!/bin/bash" > $ERAWRIM_PATH/endroit.sh; fi;
+    if [ ! -e $ERAWRIM_PATH/envers.sh ]; then echo "#!/bin/bash" > $ERAWRIM_PATH/envers.sh; fi;
+    
+    chmod +x $ERAWRIM_PATH/endroit.sh $ERAWRIM_PATH/envers.sh
+  fi
+}
+
+associe_tag_nom ()
+{
+  ZTAMP_NAME=$(cat $ERAWRIM_PATH/annuaire | grep ^$1 | cut -d ':' -f 2)
+}
+
+pose ()
+{
+  associe_tag_nom $1
+  if [ ! -z $ZTAMP_NAME ]	#ztamp inconnu
+  then
+    $ERAWRIM_PATH/$ZTAMP_NAME/pose.sh &
+    
+    TIMES=$(cat $ERAWRIM_PATH/$ZTAMP_NAME/times)
+    echo $(($TIMES+1)) > $ERAWRIM_PATH/$ZTAMP_NAME/times
+    date > $ERAWRIM_PATH/$ZTAMP_NAME/lasttime
+    
+    touch $ERAWRIM_PATH/ztamps/$ZTAMP_NAME
+  fi
+}
+
+retire ()
+{
+  associe_tag_nom $1
+  if [ ! -z $ZTAMP_NAME ]
+  then
+    $ERAWRIM_PATH/$ZTAMP_NAME/retire.sh
+    rm $ERAWRIM_PATH/ztamps/$ZTAMP_NAME
+  fi
+}
+
+prepare_home
+
+dbus-monitor --system "type='signal',sender='org.rfid.Mirror',interface='org.rfid.Mirror'" |\
+sed -u -e 's/^.*member=//' -e 's/^.*string "\(.*\)"/\1/' |\
+while read command
+do
+case $command in
+  "flipUp" ) $ERAWRIM_PATH/endroit.sh;;
+  "flipDown" ) $ERAWRIM_PATH/envers.sh;;
+  "tagEnter" ) read tag; pose $tag;;
+  "tagLeave" ) read tag; retire $tag;;
+  * ) log impossible;;
+esac
+done
