@@ -22,23 +22,25 @@ using GLib;
 
 enum Event {
 	EMPTY = 0x000,
-	UP = 0x401,
-	DOWN = 0x501,
-	ENTER = 0x102,
-	LEAVE = 0x202
+	/* First byte==1 => Mir:ror state */
+	UP = 0x0104,
+	DOWN = 0x0105,
+	/* First byte==2 => RFID event state */
+	ENTER = 0x0201,
+	LEAVE = 0x0202
 }
 
 public class MirrorDevice : Object 
 {
 
 
-	private string device;
-	private DataInputStream dis;
+	private string devname;
+	private FileStream device;
 	
 	public static string detect_mirror ()
 	{
 		int i;
-		string device = null;
+		string devname = null;
 		var devices = Glob();
 
 		int ret = devices.glob("/dev/hidraw*", 0);
@@ -52,39 +54,51 @@ public class MirrorDevice : Object
 			GLib.stdout.printf("DEBUG: found %s\n", devices.pathv[i]);
 			if(check_device(devices.pathv[i]) != 0) {
 				// Found
-				device = devices.pathv[i];
+				devname = devices.pathv[i];
 			}
 		}
 
-		return device;
+		return devname;
 	}
 
-	public MirrorDevice (string device) throws Error
+	public MirrorDevice (string devname) throws Error
 	{
-		this.device = device;
-		var file = File.new_for_path (device);
-		dis = new DataInputStream (file.read ());
-		dis.set_byte_order (DataStreamByteOrder.LITTLE_ENDIAN);
+		this.devname = devname;
+		device = FileStream.open (devname, "rb");
 	}
 
 	public async uint16 read_event (out string tag) throws IOError
 	{
 		uint8[] event_bytes = new uint8[2];
-		dis.read (event_bytes);
+		device.read (event_bytes);
+		if (event_bytes[0] != 0 || event_bytes[1] != 0)
+			GLib.stdout.printf("DEBUG: Event %02X %02X\n", event_bytes[0], event_bytes[1]);
 		// FIXME read_uint16 corrupt next reads
-		uint16 event = (event_bytes[1] << 8) + event_bytes[0];
+		uint16 event = (event_bytes[0] << 8) + event_bytes[1];
 
 		var buf = new StringBuilder();
 		if(event != Event.EMPTY)
 		{
-			dis.skip (3);
-			uint8[] tag_bytes = new uint8[2*4];
-			dis.read (tag_bytes);
+			// Skip 2 bytes
+			device.getc ();
+			device.getc ();
+			// 1 byte: length of payload
+			int len = device.getc ();
+			GLib.stdout.printf("DEBUG: Len %d\n", len);
+			// Read payload
+			uint8[] tag_bytes = new uint8[len];
+			device.read (tag_bytes);
 			foreach (uint8 cur in tag_bytes)
 			{
 				buf.append("%02X".printf(cur));
 			}
-			dis.skip (3);
+			// Align
+			// Read all next bytes to align
+			// => 16 bytes less all already read bytes
+			for (int i = 0 ; i < (16 - (2+2+1+len)) ; i++)
+			{
+				device.getc ();
+			}
 		}
 		tag = buf.str; 
 
