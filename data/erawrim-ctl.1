@@ -1,0 +1,60 @@
+.TH REF_LECT 1 "04 Jui 2012"
+.SH NAME
+erawrim\-ctl\fP \- controler for the erawrim, the Mir:ror application launcher
+
+.SH SYNOPSIS
+.B erawrim\-ctl
+(add | remove) RFID
+.SH DESCRIPTION
+.B erawrim\-ctl
+is an application to configure the erawrim launcher for
+.B ref-lect
+the user space driver for
+.B Mir:ror
+RFID USB device.
+.P
+This program must be run in interactive by user.
+.SH COMMANDS
+.B add RFID
+Declares the new RFID to associate a symbolic name, and create all
+associated files (the user can then fullfill the scripts)
+.P
+.B remove RFID
+Removes the given RFID and all associated data and scripts
+.SH FILES
+.B $HOME/.erawrim
+the root database
+.P
+.B $HOME/.erawrim/log
+the log file
+.P
+.B $HOME/.erawrim/annuaire
+the aliases between RFID id and symbolic names given by user
+.P
+.B $HOME/.erawrim/ztamps/
+this directory contains the id of currently visible ztamps
+.P
+.B $HOME/.erawrim/endroit.sh
+the script called when
+.B Mir:ror
+is flipped up
+.P
+.B $HOME/.erawrim/envers.sh
+the script called when
+.B Mir:ror
+is flipped down
+.P
+.B $HOME/.erawrim/<ztamp_alias>/pose.sh
+the script called when the associated ztamp is put
+.P
+.B $HOME/.erawrim/<ztamp_alias>/retire.sh
+the script called when the associated ztamp is poped
+.P
+.B $HOME/.erawrim/<ztamp_alias>/times
+the number of times the associated ztamp was inserted
+.P
+.B $HOME/.erawrim/<ztamp_alias>/lasttime
+the timestamp of the last insertion of the associated ztamp
+.SH AUTHORS
+Guilhem Bonnefille  <guilhem.bonnefille@gmail.com>
+

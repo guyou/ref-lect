@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# script d'initialisation d'erawrim
-# c'est ce script qui doit être lancé par l'utilisateur
+# script d'évaluation des événements
+# ce script doit être lancé par l'utilisateur en tâche de fond
 
 ERAWRIM_PATH=~/.erawrim
 DEVICE=""
@@ -19,9 +19,7 @@ prepare_home ()
   if [ ! -e $ERAWRIM_PATH ]
   then 
     mkdir $ERAWRIM_PATH
-    #ce fichier précise l'état du mirror
-    echo endroit > $ERAWRIM_PATH/etat_mirror
-    
+
     #ce fichier associe un identifiant de tag à un nom
     touch $ANNUAIRE
     touch $LOG

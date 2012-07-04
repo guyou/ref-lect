@@ -1,4 +1,7 @@
-man_MANS = ref-lect.1
+man_MANS = \
+	ref-lect.1 \
+	erawrim.1 \
+	erawrim-ctl.1
 
 dbussystemdir = $(sysconfdir)/dbus-1/system.d/
 dbusservicedir = $(datadir)/dbus-1/system-services/
