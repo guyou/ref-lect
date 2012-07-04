@@ -1,3 +1,7 @@
+ref-lect 0.4 (2012-07-04)
+* Port erawrim to Ref:lect infra
+* Fix major issue about reading from Mir:ror
+
 ref-lect 0.3 (2012-07-02)
 * Add documentation
 * Add D-Bus config files
