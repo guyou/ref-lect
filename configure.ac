@@ -33,6 +33,7 @@ AC_OUTPUT([
 Makefile
 src/Makefile
 data/Makefile
+erawrim/Makefile
 tools/Makefile
 
 ])
