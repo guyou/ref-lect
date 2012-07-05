@@ -173,6 +173,10 @@ public class Main : Object
 		if (device != null)
 		{
 			var dev = new MirrorDevice (device);
+			dev.write_event (EventType.GetMirrorId);
+			dev.write_event (EventType.GetOrientation);
+			dev.write_event (EventType.GetApplicationVersion);
+			dev.write_event (EventType.GetBootloaderVersion);
 			var loop = new MainLoop();
 			read_async(dev);
 			loop.run();

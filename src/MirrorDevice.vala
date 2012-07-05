@@ -54,7 +54,7 @@ public class MirrorDevice : Object
 	public MirrorDevice (string devname) throws Error
 	{
 		this.devname = devname;
-		device = FileStream.open (devname, "rb");
+		device = FileStream.open (devname, "r+");
 	}
 
 	public async EventType read_event (out string tag) throws IOError
@@ -93,5 +93,20 @@ public class MirrorDevice : Object
 		tag = buf.str; 
 
 		return event;
+	}
+
+	public void write_event (EventType event)
+	{
+		// Compute bytes
+		uint8[] event_bytes = new uint8[2];
+		event_bytes[0] = event >> 8;
+		event_bytes[1] = event & 0xFF;
+		GLib.stdout.printf("DEBUG: Writing Event %02X %02X\n", event_bytes[0], event_bytes[1]);
+
+		// Write message
+		device.write (event_bytes);
+		uint8[] tail = new uint8[16-2];
+		device.write (tail);
+		device.flush ();
 	}
 }
