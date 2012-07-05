@@ -19,19 +19,20 @@
 
 using GLib;
 using Gee;
+using Mirror;
 
 [DBus (name = "org.rfid.Mirror")]
 public class MirrorServer : Object {
 
-	private uint16 state = Event.UP;
+	private uint16 state = EventType.OrientationUp;
 	private HashSet<string> tagList = new HashSet<string> ();	
 
 	public string getState () {
         switch(state)
 		{
-			case Event.UP:
+			case EventType.OrientationUp:
 				return "UP";
-			case Event.DOWN:
+			case EventType.OrientationDown:
 				return "DOWN";
 			default:
 				return "UNKNOWN";
@@ -52,30 +53,33 @@ public class MirrorServer : Object {
     public signal void flipDown ();
 
 	[DBus (visible = false)]
-	public void processEvent (uint16 event, ref string tag) {
+	public void processEvent (EventType event, ref string tag) {
 		switch(event)
 		{
-			case Event.UP:
+			case EventType.Unspecified:
+				break;
+			case EventType.OrientationUp:
 				stdout.printf ("DEBUG: mirror flipped up\n");
-				state = Event.UP;
+				state = event;
 				this.flipUp ();
 				break;
-			case Event.DOWN:
+			case EventType.OrientationDown:
 				stdout.printf ("DEBUG: mirror flipped down\n");
-				state = Event.DOWN;
+				state = event;
 				this.flipDown ();
 				break;
-			case Event.ENTER:
+			case EventType.ShowTag:
 				stdout.printf ("DEBUG: tag entered: %s\n", tag);
 				tagList.add (tag);
 				this.tagEnter (tag);
 				break;
-			case Event.LEAVE:
+			case EventType.HideTag:
 				stdout.printf ("DEBUG: tag left: %s\n", tag);
 				tagList.remove (tag);
 				this.tagLeave (tag);
 				break;
 			default:
+				stdout.printf ("DEBUG: event %s payload %s\n", event.to_string(), tag);
 				break;
 		}
 	}
@@ -98,8 +102,8 @@ async void read_async (MirrorDevice dev)
 		{
 			// FIXME break loop cleanly
 			string tag = "";
-			uint16 event = yield dev.read_event (out tag);
-			if (event != Event.EMPTY)
+			EventType event = yield dev.read_event (out tag);
+			if (event != EventType.Unspecified)
 			stdout.printf ("DEBUG: event: %d %04X\n", event, event);
 			mirror.processEvent (event, ref tag);
 		}
