@@ -24,8 +24,13 @@ using Mirror;
 [DBus (name = "org.rfid.Mirror")]
 public class MirrorServer : Object {
 
+	public string id = "<not-set>";
 	private uint16 state = EventType.OrientationUp;
 	private HashSet<string> tagList = new HashSet<string> ();	
+
+	public string get_id () {
+		return id;
+	}
 
 	public string get_state () {
         switch(state)
@@ -77,6 +82,10 @@ public class MirrorServer : Object {
 				stdout.printf ("DEBUG: tag left: %s\n", tag);
 				tagList.remove (tag);
 				this.tag_leave (tag);
+				break;
+			case EventType.MirrorId:
+				stdout.printf ("DEBUG: Mir:ror id: %s\n", tag);
+				this.id = tag;
 				break;
 			default:
 				stdout.printf ("DEBUG: event %s payload %s\n", event.to_string(), tag);

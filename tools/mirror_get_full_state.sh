@@ -2,6 +2,13 @@
 
 #BUS=--session
 BUS=--system
+# Get id of the mirror
+#
+# Example result:
+# method return sender=:1.5 -> dest=:1.14 reply_serial=2
+#   string "UP"
+dbus-send $BUS --print-reply --dest=org.rfid.Mirror /org/rfid/mirror org.rfid.Mirror.GetId
+
 # Get state of the mirror
 #
 # Example result:
