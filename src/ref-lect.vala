@@ -27,7 +27,7 @@ public class MirrorServer : Object {
 	private uint16 state = EventType.OrientationUp;
 	private HashSet<string> tagList = new HashSet<string> ();	
 
-	public string getState () {
+	public string get_state () {
         switch(state)
 		{
 			case EventType.OrientationUp:
@@ -39,18 +39,18 @@ public class MirrorServer : Object {
 		}
     }
 
-    public string[] getTags () {
+    public string[] get_tags () {
         return tagList.to_array ();
     }
 
-    public void resetAll () {
+    public void reset_all () {
         tagList.clear ();
     }
 
-    public signal void tagEnter (string tag);
-    public signal void tagLeave (string tag);
-    public signal void flipUp ();
-    public signal void flipDown ();
+    public signal void tag_enter (string tag);
+    public signal void tag_leave (string tag);
+    public signal void flip_up ();
+    public signal void flip_down ();
 
 	[DBus (visible = false)]
 	public void processEvent (EventType event, ref string tag) {
@@ -61,22 +61,22 @@ public class MirrorServer : Object {
 			case EventType.OrientationUp:
 				stdout.printf ("DEBUG: mirror flipped up\n");
 				state = event;
-				this.flipUp ();
+				this.flip_up ();
 				break;
 			case EventType.OrientationDown:
 				stdout.printf ("DEBUG: mirror flipped down\n");
 				state = event;
-				this.flipDown ();
+				this.flip_down ();
 				break;
 			case EventType.ShowTag:
 				stdout.printf ("DEBUG: tag entered: %s\n", tag);
 				tagList.add (tag);
-				this.tagEnter (tag);
+				this.tag_enter (tag);
 				break;
 			case EventType.HideTag:
 				stdout.printf ("DEBUG: tag left: %s\n", tag);
 				tagList.remove (tag);
-				this.tagLeave (tag);
+				this.tag_leave (tag);
 				break;
 			default:
 				stdout.printf ("DEBUG: event %s payload %s\n", event.to_string(), tag);
