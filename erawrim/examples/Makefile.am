@@ -1,5 +1,7 @@
 ref_lectexamplesdir = ${prefix}/doc/ref-lect/examples
 ref_lectexamples_DATA = \
+	pose.sh \
+	retire.sh \
 	envers.sh \
 	endroit.sh
 
@@ -11,6 +13,14 @@ envers.sh: $(srcdir)/envers.sh.in
 endroit.sh: $(srcdir)/endroit.sh.in
 	$(AM_V_GEN)sed -e 's,@ICONSDIR\@,$(iconsdir),g' < $< > $@
 
+pose.sh: $(srcdir)/pose.sh.in
+	$(AM_V_GEN)sed -e 's,@ICONSDIR\@,$(iconsdir),g' < $< > $@
+
+retire.sh: $(srcdir)/retire.sh.in
+	$(AM_V_GEN)sed -e 's,@ICONSDIR\@,$(iconsdir),g' < $< > $@
+
 EXTRA_DIST = \
+	pose.sh.in \
+	retire.sh.in \
 	envers.sh.in \
 	endroit.sh.in

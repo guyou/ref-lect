@@ -1,0 +1,6 @@
+#!/bin/bash
+
+notify-send --icon=@ICONSDIR@/reflect_logo.png "Retrait du Ztamp $1" \
+"Retrait d'un Ztamp inconnu sur le Mir:ror :
+$1. Utiliser la commande :
+erawrim-ctl add $1"
