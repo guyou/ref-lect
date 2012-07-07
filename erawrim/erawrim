@@ -27,6 +27,8 @@ prepare_home ()
     #ce dossier contient la liste des ztamps posés à un instant t
     if [ ! -e $ERAWRIM_PATH/ztamps ]; then mkdir $ERAWRIM_PATH/ztamps; fi;
     
+    
+    # gestionnaires de l'orientation du Mir:ror
     if [ ! -e $ERAWRIM_PATH/endroit.sh ]; then echo "#!/bin/bash" > $ERAWRIM_PATH/endroit.sh; fi;
     if [ ! -e $ERAWRIM_PATH/envers.sh ]; then echo "#!/bin/bash" > $ERAWRIM_PATH/envers.sh; fi;
     
@@ -41,10 +43,12 @@ associe_tag_nom ()
 
 pose ()
 {
-  associe_tag_nom $1
+  associe_tag_nom "$1"
   if [ ! -z $ZTAMP_NAME ]	#ztamp inconnu
   then
-    $ERAWRIM_PATH/$ZTAMP_NAME/pose.sh &
+    SCRIPT="$ERAWRIM_PATH/$ZTAMP_NAME/pose.sh"
+    test -x $SCRIPT || echo "Bizarre, le script $SCRIPT ne peut pas être activé" >> $LOG
+    $SCRIPT
     
     TIMES=$(cat $ERAWRIM_PATH/$ZTAMP_NAME/times)
     echo $(($TIMES+1)) > $ERAWRIM_PATH/$ZTAMP_NAME/times
@@ -56,9 +60,12 @@ pose ()
 
 retire ()
 {
-  associe_tag_nom $1
+  associe_tag_nom "$1"
   if [ ! -z $ZTAMP_NAME ]
   then
+    SCRIPT="$ERAWRIM_PATH/$ZTAMP_NAME/retire.sh"
+    test -x $SCRIPT || echo "Bizarre, le script $SCRIPT ne peut pas être activé" >> $LOG
+    $SCRIPT
     $ERAWRIM_PATH/$ZTAMP_NAME/retire.sh
     rm $ERAWRIM_PATH/ztamps/$ZTAMP_NAME
   fi
@@ -73,8 +80,8 @@ do
 case $command in
   "FlipUp" ) $ERAWRIM_PATH/endroit.sh;;
   "FlipDown" ) $ERAWRIM_PATH/envers.sh;;
-  "TagEnter" ) read tag; pose $tag;;
-  "TagLeave" ) read tag; retire $tag;;
+  "TagEnter" ) read tag; pose "$tag";;
+  "TagLeave" ) read tag; retire "$tag";;
   * ) log impossible;;
 esac
 done
