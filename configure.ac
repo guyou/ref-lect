@@ -28,6 +28,9 @@ PKG_CHECK_MODULES(REF_LECT, [
 	dbus-1
 ])
 
+iconsdir=$datadir/reflect/icons
+AC_SUBST([iconsdir], [$iconsdir])
+
 
 AC_OUTPUT([
 Makefile

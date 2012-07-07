@@ -13,9 +13,14 @@ dbusservice_DATA = \
 org.rfid.Mirror.service: $(srcdir)/org.rfid.Mirror.service.in
 	$(AM_V_GEN)sed -e 's,@BINDIR\@,$(bindir),g' < $< > $@
 
+iconsdir = $(datadir)/ref-lect/icons
+icons_DATA = reflect_logo.png
+
 EXTRA_DIST = \
 	$(man_MANS) \
 	$(dbussystem_DATA) \
+	reflect_logo.xcf \
+	$(icons_DATA) \
 	org.rfid.Mirror.service.in
 
 DISTCLEANFILES = \
