@@ -25,6 +25,8 @@ using Mirror;
 public class MirrorServer : Object {
 
 	public string id = "<not-set>";
+	public string app_version = "<not-set>";
+	public string boot_version = "<not-set>";
 	private uint16 state = EventType.OrientationUp;
 	private HashSet<string> tagList = new HashSet<string> ();	
 
@@ -32,6 +34,14 @@ public class MirrorServer : Object {
 		return id;
 	}
 
+	public string get_app_version () {
+		return app_version;
+	}
+	
+	public string get_boot_version () {
+		return boot_version;
+	}
+	
 	public string get_state () {
         switch(state)
 		{
@@ -86,6 +96,14 @@ public class MirrorServer : Object {
 			case EventType.MirrorId:
 				stdout.printf ("DEBUG: Mir:ror id: %s\n", tag);
 				this.id = tag;
+				break;
+			case EventType.ApplicationVersion:
+				stdout.printf ("DEBUG: Mir:ror application's version: %s\n", tag);
+				this.app_version = tag;
+				break;
+			case EventType.BootloaderVersion:
+				stdout.printf ("DEBUG: Mir:ror bootloader's version: %s\n", tag);
+				this.boot_version = tag;
 				break;
 			default:
 				stdout.printf ("DEBUG: event %s payload %s\n", event.to_string(), tag);
@@ -182,6 +200,8 @@ public class Main : Object
 		if (device != null)
 		{
 			var dev = new MirrorDevice (device);
+			// Send commands to force events
+			// This will allow to update the internal state
 			dev.write_event (EventType.GetMirrorId);
 			dev.write_event (EventType.GetOrientation);
 			dev.write_event (EventType.GetApplicationVersion);
