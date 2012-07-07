@@ -1,0 +1,3 @@
+#!/bin/bash
+
+notify-send --icon=@ICONSDIR@/reflect_logo.png "Mir:ror à l'envers"

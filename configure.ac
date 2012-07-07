@@ -37,6 +37,7 @@ Makefile
 src/Makefile
 data/Makefile
 erawrim/Makefile
+erawrim/examples/Makefile
 tools/Makefile
 
 ])
