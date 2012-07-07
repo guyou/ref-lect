@@ -29,6 +29,7 @@ prepare_home ()
     #ce dossier contient la liste des ztamps posés à un instant t
     if [ ! -e $ERAWRIM_PATH/ztamps ]; then mkdir $ERAWRIM_PATH/ztamps; fi;
     
+    # gestionnaires de l'orientation du Mir:ror
     if [ ! -e $ERAWRIM_PATH/endroit.sh ]; then echo "#!/bin/bash" > $ERAWRIM_PATH/endroit.sh; fi;
     if [ ! -e $ERAWRIM_PATH/envers.sh ]; then echo "#!/bin/bash" > $ERAWRIM_PATH/envers.sh; fi;
     
@@ -71,8 +72,7 @@ add ()
 remove ()
 {
   #associe_tag_nom $1
-  cat $ANNUAIRE  | grep $1$
-  if (( !$? ))
+  if cat $ANNUAIRE  | grep "$1\$"
   then
     ZTAMP_NAME=$1
     rm -r $ERAWRIM_PATH/$ZTAMP_NAME
@@ -88,7 +88,7 @@ remove ()
 prepare_home
 
 case $1 in
-  "add" ) add $2;;
-  "remove" ) remove $2;;
+  "add" ) add "$2";;
+  "remove" ) remove "$2";;
   * ) echo impossible;;
 esac
