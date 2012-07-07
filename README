@@ -9,3 +9,13 @@ Usage
 See ref-lect(1) man page for detailled information about the daemon.
 
 In tools/ directory, you will find some useful examples of clients to play with the daemon.
+
+erawrim
+-------
+The directory erawrim/ contains the port of an already existing tool
+for Mir:ror. These tools allow a simple management of Ztamps:
+- use erawrim-ctl to add or remove Ztamps
+- launch erawrim as a user's daemon (at session start ?)
+See erawrim(1) and erawrim-ctl(1) for more informations.
+
+The directory erawrim/examples contains some example of script to use.
