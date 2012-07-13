@@ -100,9 +100,37 @@ remove ()
   fi
 }
 
+start ()
+{
+	if [ -e $ERAWRIM_PATH/erawrim.pid ]
+	then
+		echo "On dirait que le process tourne déjà." >&2
+		echo "Faire un stop avant de recommencer." >&2
+		return
+	fi
+	# On suppose que le daemon est accessible comme l'utilitaire de configuration
+	DAEMON=`echo $0 | sed 's/-ctl//'`
+	setsid $DAEMON </dev/null >/dev/null 2>/dev/null &
+	echo $! > $ERAWRIM_PATH/erawrim.pid
+}
+
+stop ()
+{
+	if [ -e $ERAWRIM_PATH/erawrim.pid ]
+	then
+		PID=`cat $ERAWRIM_PATH/erawrim.pid`
+		test -z "$PID" || kill -TERM -$PID
+		rm $ERAWRIM_PATH/erawrim.pid
+	else
+		echo "On dirait que le process ne tourne pas." >&2
+	fi
+}
+
 prepare_home
 
 case $1 in
+  "start" ) start;;
+  "stop" ) stop;;
   "add" ) add "$2";;
   "remove" ) remove "$2";;
   * ) echo impossible;;
