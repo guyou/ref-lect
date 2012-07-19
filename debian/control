@@ -1,0 +1,28 @@
+Source: reflect
+Section: unknown
+Priority: extra
+Maintainer: Guilhem Bonnefille <guilhem.bonnefille@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev
+Standards-Version: 3.9.2
+Homepage: http://code.google.com/p/ref-lect/
+#Vcs-Git: git://git.debian.org/collab-maint/reflect.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/reflect.git;a=summary
+
+Package: reflect
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: D-Bus service to publish Mir:ror events
+ <insert long description, indented with spaces>
+
+#Package: reflect-doc
+#Architecture: all
+#Description: documentation for reflect
+# <insert long description, indented with spaces>
+
+Package: erawrim
+Architecture: all
+Depends: ${misc:Depends}, reflect (>= 0.4), bash, dbus
+Description: User session daemon to fire script on Mir:ror events
+ <insert long description, indented with spaces>
+
+

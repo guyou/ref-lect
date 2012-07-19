@@ -1,0 +1,5 @@
+usr/bin/ref-lect
+usr/share/man/man1/ref-lect.1
+usr/share/dbus-1/system-services/org.rfid.Mirror.service
+etc/dbus-1/system.d/org.rfid.Mirror.conf
+

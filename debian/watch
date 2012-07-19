@@ -1,0 +1,6 @@
+# See uscan(1) for format
+
+# Compulsory line, this is a version 3 file
+version=3
+
+http://code.google.com/p/ref-lect/downloads/list?can=1 .*/ref-lect-(\d[\d.]*)\.(?:zip|tgz|tbz2|txz|tar\.gz|tar\.bz2|tar\.xz)
