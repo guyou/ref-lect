@@ -24,3 +24,6 @@ EXTRA_DIST = \
 	retire.sh.in \
 	envers.sh.in \
 	endroit.sh.in
+
+DISTCLEANFILES = \
+	$(ref_lectexamples_DATA)
