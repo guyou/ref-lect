@@ -1,3 +1,14 @@
+ref-lect 0.5 (2012-08-30)
+* Integrate Mir:lite reverse engeneering
+* Fix naming conventions of D-Bus signals and methods
+* Add Mir:ror ID handling
+* [ERAWRIM] Add erawrim script examples
+* Add support for application and bootloader versions
+* [ERAWRIM] Add default handlers for unconfigured Ztamps
+* [ERAWRIM] Add a start/stop commands to erawrim-ctl
+* [DOC/ERAWRIM] Add examples to lock session
+* Rename ref-lect daemon to reflectd
+
 ref-lect 0.4 (2012-07-04)
 * Port erawrim to Ref:lect infra
 * Fix major issue about reading from Mir:ror

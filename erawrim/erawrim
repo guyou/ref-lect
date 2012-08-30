@@ -27,10 +27,26 @@ prepare_home ()
     #ce dossier contient la liste des ztamps posés à un instant t
     if [ ! -e $ERAWRIM_PATH/ztamps ]; then mkdir $ERAWRIM_PATH/ztamps; fi;
     
+    
+    # gestionnaires de l'orientation du Mir:ror
     if [ ! -e $ERAWRIM_PATH/endroit.sh ]; then echo "#!/bin/bash" > $ERAWRIM_PATH/endroit.sh; fi;
     if [ ! -e $ERAWRIM_PATH/envers.sh ]; then echo "#!/bin/bash" > $ERAWRIM_PATH/envers.sh; fi;
     
     chmod +x $ERAWRIM_PATH/endroit.sh $ERAWRIM_PATH/envers.sh
+    
+    # gestionnaires par défaut pour les ztamps
+    if [ ! -e $ERAWRIM_PATH/defaut/pose.sh ];
+    then
+		echo "#!/bin/bash" > $ERAWRIM_PATH/defaut/pose.sh;
+		echo "# Gestionnaire par défaut lors de la pose d'un Ztamp" >> $ERAWRIM_PATH/defaut/pose.sh;
+	fi;
+    if [ ! -e $ERAWRIM_PATH/defaut/retire.sh ];
+    then
+		echo "#!/bin/bash" > $ERAWRIM_PATH/defaut/retire.sh;
+		echo "# Gestionnaire par défaut lors du retrait d'un Ztamp" >> $ERAWRIM_PATH/defaut/retire.sh;
+	fi;
+    
+    chmod +x $ERAWRIM_PATH/defaut/pose.sh $ERAWRIM_PATH/defaut/retire.sh
   fi
 }
 
@@ -41,40 +57,49 @@ associe_tag_nom ()
 
 pose ()
 {
-  associe_tag_nom $1
+  associe_tag_nom "$1"
   if [ ! -z $ZTAMP_NAME ]	#ztamp inconnu
   then
-    $ERAWRIM_PATH/$ZTAMP_NAME/pose.sh &
+    SCRIPT="$ERAWRIM_PATH/$ZTAMP_NAME/pose.sh"
+    test -x $SCRIPT || echo "Bizarre, le script $SCRIPT ne peut pas être activé" >> $LOG
+    $SCRIPT
     
     TIMES=$(cat $ERAWRIM_PATH/$ZTAMP_NAME/times)
     echo $(($TIMES+1)) > $ERAWRIM_PATH/$ZTAMP_NAME/times
     date > $ERAWRIM_PATH/$ZTAMP_NAME/lasttime
     
     touch $ERAWRIM_PATH/ztamps/$ZTAMP_NAME
+  else
+	test -x $ERAWRIM_PATH/defaut/pose.sh && $ERAWRIM_PATH/defaut/pose.sh "$1"
   fi
 }
 
 retire ()
 {
-  associe_tag_nom $1
+  associe_tag_nom "$1"
   if [ ! -z $ZTAMP_NAME ]
   then
+    SCRIPT="$ERAWRIM_PATH/$ZTAMP_NAME/retire.sh"
+    test -x $SCRIPT || echo "Bizarre, le script $SCRIPT ne peut pas être activé" >> $LOG
+    $SCRIPT
     $ERAWRIM_PATH/$ZTAMP_NAME/retire.sh
     rm $ERAWRIM_PATH/ztamps/$ZTAMP_NAME
+  else
+    test -x $ERAWRIM_PATH/defaut/retire.sh && $ERAWRIM_PATH/defaut/retire.sh "$1"
   fi
 }
 
 prepare_home
 
-dbus-monitor --system "type='signal',sender='org.rfid.Mirror',interface='org.rfid.Mirror'" |\
-sed -u -e 's/^.*member=//' -e 's/^.*string "\(.*\)"/\1/' |\
-while read command
+coproc { dbus-monitor --system "type='signal',sender='org.rfid.Mirror',interface='org.rfid.Mirror'" |\
+sed -u -e 's/^.*member=//' -e 's/^.*string "\(.*\)"/\1/' ;}
+while read -u ${COPROC[0]} command
 do
 case $command in
-  "flipUp" ) $ERAWRIM_PATH/endroit.sh;;
-  "flipDown" ) $ERAWRIM_PATH/envers.sh;;
-  "tagEnter" ) read tag; pose $tag;;
-  "tagLeave" ) read tag; retire $tag;;
+  "FlipUp" ) $ERAWRIM_PATH/endroit.sh;;
+  "FlipDown" ) $ERAWRIM_PATH/envers.sh;;
+  "TagEnter" ) read -u ${COPROC[0]} tag; pose "$tag";;
+  "TagLeave" ) read -u ${COPROC[0]} tag; retire "$tag";;
   * ) log impossible;;
 esac
 done

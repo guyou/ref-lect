@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
-AC_INIT(ref-lect, 0.4)
+AC_INIT(ref-lect, 0.5)
 
 AC_CONFIG_HEADERS([config.h])
 
@@ -28,12 +28,16 @@ PKG_CHECK_MODULES(REF_LECT, [
 	dbus-1
 ])
 
+iconsdir=$datadir/reflect/icons
+AC_SUBST([iconsdir], [$iconsdir])
+
 
 AC_OUTPUT([
 Makefile
 src/Makefile
 data/Makefile
 erawrim/Makefile
+erawrim/examples/Makefile
 tools/Makefile
 
 ])

@@ -17,5 +17,5 @@
 
 [D-BUS Service]
 Name=org.rfid.Mirror
-Exec=@BINDIR@/ref-lect
+Exec=@BINDIR@/reflectd
 User=root
