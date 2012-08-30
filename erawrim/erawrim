@@ -96,10 +96,10 @@ sed -u -e 's/^.*member=//' -e 's/^.*string "\(.*\)"/\1/' ;}
 while read -u ${COPROC[0]} command
 do
 case $command in
-  "flipUp" ) $ERAWRIM_PATH/endroit.sh;;
-  "flipDown" ) $ERAWRIM_PATH/envers.sh;;
-  "tagEnter" ) read -u ${COPROC[0]} tag; pose "$tag";;
-  "tagLeave" ) read -u ${COPROC[0]} tag; retire "$tag";;
+  "FlipUp" ) $ERAWRIM_PATH/endroit.sh;;
+  "FlipDown" ) $ERAWRIM_PATH/envers.sh;;
+  "TagEnter" ) read -u ${COPROC[0]} tag; pose "$tag";;
+  "TagLeave" ) read -u ${COPROC[0]} tag; retire "$tag";;
   * ) log impossible;;
 esac
 done

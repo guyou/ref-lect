@@ -1,6 +1,5 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * main.c
  * Copyright (C) 2012 Guilhem Bonnefille <guilhem.bonnefille@gmail.com>
  * 
  * ref-lect is free software: you can redistribute it and/or modify it
@@ -19,16 +18,7 @@
 
 using Posix;
 using GLib;
-
-enum Event {
-	EMPTY = 0x000,
-	/* First byte==1 => Mir:ror state */
-	UP = 0x0104,
-	DOWN = 0x0105,
-	/* First byte==2 => RFID event state */
-	ENTER = 0x0201,
-	LEAVE = 0x0202
-}
+using Mirror;
 
 public class MirrorDevice : Object 
 {
@@ -64,20 +54,20 @@ public class MirrorDevice : Object
 	public MirrorDevice (string devname) throws Error
 	{
 		this.devname = devname;
-		device = FileStream.open (devname, "rb");
+		device = FileStream.open (devname, "r+");
 	}
 
-	public async uint16 read_event (out string tag) throws IOError
+	public async EventType read_event (out string tag) throws IOError
 	{
 		uint8[] event_bytes = new uint8[2];
 		device.read (event_bytes);
 		if (event_bytes[0] != 0 || event_bytes[1] != 0)
 			GLib.stdout.printf("DEBUG: Event %02X %02X\n", event_bytes[0], event_bytes[1]);
-		// FIXME read_uint16 corrupt next reads
-		uint16 event = (event_bytes[0] << 8) + event_bytes[1];
+		
+		EventType event = EventTypeParser.Parse (event_bytes);
 
 		var buf = new StringBuilder();
-		if(event != Event.EMPTY)
+		if(event != EventType.Unspecified)
 		{
 			// Skip 2 bytes
 			device.getc ();
@@ -103,5 +93,20 @@ public class MirrorDevice : Object
 		tag = buf.str; 
 
 		return event;
+	}
+
+	public void write_event (EventType event)
+	{
+		// Compute bytes
+		uint8[] event_bytes = new uint8[2];
+		event_bytes[0] = event >> 8;
+		event_bytes[1] = event & 0xFF;
+		GLib.stdout.printf("DEBUG: Writing Event %02X %02X\n", event_bytes[0], event_bytes[1]);
+
+		// Write message
+		device.write (event_bytes);
+		uint8[] tail = new uint8[16-2];
+		device.write (tail);
+		device.flush ();
 	}
 }

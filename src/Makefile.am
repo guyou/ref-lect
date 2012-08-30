@@ -17,6 +17,7 @@ AM_CFLAGS =\
 bin_PROGRAMS = reflectd
 
 reflectd_SOURCES = \
+	EventType.vala EventTypeParser.vala \
 	reflectd.vala config.vapi MirrorDevice.vala mir-ror.c mir-ror.vapi
 
 reflectd_VALAFLAGS =  \
