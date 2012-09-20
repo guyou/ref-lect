@@ -1,3 +1,10 @@
+reflect (0.5-1) unstable; urgency=low
+
+  * New upstream version 0.5
+  * Update control file due to reflect rename
+
+ -- Guilhem Bonnefille <guilhem.bonnefille@gmail.com>  Thu, 30 Aug 2012 22:46:25 +0200
+
 reflect (0.4-1) unstable; urgency=low
 
   * Initial release
