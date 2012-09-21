@@ -1,6 +1,7 @@
 // pam_mir-ror.c
 /*
  * Copyright (c) 2009 - Joël PASTRE 'Jopa'  <joel@jopa.fr>
+ * Copyright (c) 2012 - Guilhem Bonnefille <guilhem/bonnefille@gmail.com>
  *
  * This file is part of the pam_mir-ror project. pam_mir-ror is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
@@ -21,7 +22,6 @@
 #include <security/_pam_macros.h>
 #include <security/pam_ext.h>
 
-
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -34,19 +34,22 @@
 
 #include <termios.h>
 
-#include "mir-ror.h"
+#include <pwd.h>
 
-#include "version.h"
+#include "check_token.h"
 
 #define PAM_SM_AUTH
 
-// thread_pam_prompt : prompt user to use mir:ror
-void * thread_pam_prompt(void* data) {
-    pam_handle_t *pamh = data;
-    char *resp;
-    pam_prompt(pamh,PAM_PROMPT_ECHO_OFF, &resp,"Ok ! Show me your Ztamp:s : ");
+#define TAGFILE	".authtag"
 
-    return NULL;
+//-----------------------------------------------------------------------------
+// get_user_tagfile : Build ~/.auth path using user name and passwd file.
+// 		      return filename with complete path.
+static
+void get_user_tagfile(char *user, char *tagfile) {
+  struct passwd *pw;
+  pw = getpwnam (user);
+  sprintf(tagfile,"%s/%s",pw->pw_dir,TAGFILE);
 }
 
 //----------------------------------------------------------------------------
@@ -61,7 +64,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
     char device[50];
     
     char stored_tag[25];
-    char mirror_tag[25];    
+    char *ptr;
 
     char tag_file_path[256];
     FILE *tagfile;
@@ -117,35 +120,21 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
       return (PAM_SERVICE_ERR);
     }	
     
-    fgets(stored_tag,25,tagfile);
-    
-    // Detect mir:ror device
-    if (detect_mirror(device)!=0) {
-      syslog(LOG_WARNING, "Unable to detect Mir:ror device.\n");
+    if (fgets(stored_tag,25,tagfile) == NULL) {
+      syslog(LOG_WARNING,"Unable to read rfid tag file : %s, for user : %s ",tag_file_path,user);
       closelog();
-      return (PAM_AUTH_ERR);
+      return (PAM_SERVICE_ERR);
     }
-
-    // Create thread for prompt display    
-    pthread_create (&prompt,NULL,thread_pam_prompt,pamh);
-
-    if (get_mirror_tag(mirror_tag,device)!=0) {
-      syslog(LOG_WARNING, "Failed to access Mir:ror device : %s",device);
-      closelog();
-      return(PAM_AUTH_ERR);
-    }
+    // Clean read: remove not allowed characters
+    ptr = stored_tag;
+    while (*ptr != '\0') {
+		if (strchr("ABCDEF0123456789", *ptr) == NULL)
+			*ptr = '\0';
+		ptr++;
+	}
     
-    // Ok, killing prompt thread now...
-    pthread_cancel(prompt);   
-    
-    //Restore term attributes
-    if (term_isatty==1) {
-       tcsetattr(STDIN_FILENO,TCSADRAIN,&term_attr);
-    }
-    printf("\n");
-
     // Compare stored tag with ztamp:s tag
-    if (strcmp (stored_tag,mirror_tag)==0) {
+    if (check_token (stored_tag)==0) {
 	syslog(LOG_WARNING,"Authentification granted for user '%s' (%s)\n",user,service);
     	closelog();
 	return (PAM_SUCCESS);
