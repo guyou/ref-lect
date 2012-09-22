@@ -28,10 +28,10 @@ LIBS="$LIBS -ldl -lpam -lpam_misc"
 
 case "$host" in
   *-*-linux*)
-    PAM_MODDIR="/lib/security"
+    PAM_MODDIR="${libdir}/security"
     ;;
   *)
-    PAM_MODDIR="/usr/lib"
+    PAM_MODDIR="${libdir}"
     ;;
 esac
 AC_SUBST(PAM_MODDIR)
