@@ -88,7 +88,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 
     if (retval != PAM_SUCCESS) {
       syslog(LOG_WARNING, "Unable to retrieve the PAM service name.\n");
-      return (PAM_AUTH_ERR);
+      return PAM_AUTH_ERR;
       closelog();
     }
 
@@ -96,7 +96,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
     if (pam_get_user(pamh, &user, NULL) != PAM_SUCCESS || !user || !*user) {
         syslog(LOG_WARNING, "Unable to retrieve the PAM user name.\n");
 	closelog();
-	return (PAM_AUTH_ERR);
+	return PAM_AUTH_ERR;
     }
 
     syslog(LOG_WARNING,"Authentification request for user '%s' (%s)\n",user,service);
@@ -104,9 +104,9 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
     //No rfid use for ssh tty
     if (pam_get_item(pamh, PAM_TTY, (const void **)(const void *)&tty) == PAM_SUCCESS) {
        if (tty && !strcmp(tty,"ssh")) {
-         syslog(LOG_WARNING,"Not using RFID for SSH Authentification.\n");
+         syslog(LOG_WARNING,"Not using RFID for SSH Authentification.");
          closelog();
-	 return (PAM_AUTH_ERR); 
+	 return PAM_AUTH_ERR;
        }
     }
 
@@ -115,15 +115,15 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
     tagfile = fopen (tag_file_path,"r");
     
     if (tagfile==NULL) {
-      syslog(LOG_WARNING,"Unable to open rfid tag file : %s, for user : %s ",tag_file_path,user);
+      syslog(LOG_WARNING,"Unable to open rfid tag file : %s, for user : %s",tag_file_path,user);
       closelog();
-      return (PAM_SERVICE_ERR);
+      return PAM_SERVICE_ERR;
     }	
     
     if (fgets(stored_tag,25,tagfile) == NULL) {
-      syslog(LOG_WARNING,"Unable to read rfid tag file : %s, for user : %s ",tag_file_path,user);
+      syslog(LOG_WARNING,"Unable to read rfid tag file : %s, for user : %s",tag_file_path,user);
       closelog();
-      return (PAM_SERVICE_ERR);
+      return PAM_SERVICE_ERR;
     }
     // Clean read: remove not allowed characters
     ptr = stored_tag;
@@ -135,15 +135,15 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
     
     // Compare stored tag with ztamp:s tag
     if (check_token (stored_tag)==0) {
-	syslog(LOG_WARNING,"Authentification granted for user '%s' (%s)\n",user,service);
+	syslog(LOG_WARNING,"Authentification granted for user '%s' (%s)",user,service);
     	closelog();
-	return (PAM_SUCCESS);
+	return PAM_SUCCESS;
     
     } else {
-	syslog(LOG_WARNING,"Authentification failure for user '%s' (%s)\n",user,service);
+	syslog(LOG_WARNING,"Authentification failure for user '%s' (%s)",user,service);
 	closelog();
 	
-	return (PAM_AUTH_ERR);
+	return PAM_AUTH_ERR;
     }
 
 }//pam_sm_authenticate
