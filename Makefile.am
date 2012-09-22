@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ## Created by Anjuta
 
-SUBDIRS = src data erawrim pam_mir-ror tools
+SUBDIRS = src data erawrim pam_ref-lect tools
 
 ref_lectdocdir = ${prefix}/doc/ref-lect
 ref_lectdoc_DATA = \

@@ -60,7 +60,7 @@ src/Makefile
 data/Makefile
 erawrim/Makefile
 erawrim/examples/Makefile
-pam_mir-ror/Makefile
+pam_ref-lect/Makefile
 tools/Makefile
 
 ])

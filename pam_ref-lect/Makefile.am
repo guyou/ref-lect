@@ -19,12 +19,12 @@
 AM_CFLAGS = -DSBINDIR=\"@sbindir@\" @PAM_MIRROR_CFLAGS@
 
 pamdir = @PAM_MODDIR@
-pam_LTLIBRARIES = pam_mirror.la
+pam_LTLIBRARIES = pam_reflect.la
 
-pam_mirror_la_SOURCES = pam_mir-ror.c mirror.h mirror.c
-pam_mirror_la_LDFLAGS = -module -avoid-version
-pam_mirror_la_LIBADD = @PAM_MIRROR_LIBS@
-pam_mirror_la_CFLAGS = $(AM_CFLAGS)
+pam_reflect_la_SOURCES = pam_ref-lect.c mirror.h mirror.c
+pam_reflect_la_LDFLAGS = -module -avoid-version
+pam_reflect_la_LIBADD = @PAM_MIRROR_LIBS@
+pam_reflect_la_CFLAGS = $(AM_CFLAGS)
 
 check_PROGRAMS = check_token
 
