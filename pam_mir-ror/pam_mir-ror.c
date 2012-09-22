@@ -1,13 +1,12 @@
-// pam_mir-ror.c
 /*
  * Copyright (c) 2009 - Joël PASTRE 'Jopa'  <joel@jopa.fr>
  * Copyright (c) 2012 - Guilhem Bonnefille <guilhem/bonnefille@gmail.com>
  *
- * This file is part of the pam_mir-ror project. pam_mir-ror is free software;
+ * This file is part of the ref:lect project. ref:lect is free software;
  * you can redistribute it and/or modify it under the terms of the GNU General
  * Public License version 2, as published by the Free Software Foundation.
  *
- * pam_mir-ror is distributed in the hope that it will be useful, but WITHOUT ANY
+ * ref:lect is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  * details.
