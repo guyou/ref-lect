@@ -47,110 +47,110 @@
 // 		      return filename with complete path.
 static
 void get_user_tagfile(char *user, char *tagfile) {
-  struct passwd *pw;
-  pw = getpwnam (user);
-  sprintf(tagfile,"%s/%s",pw->pw_dir,TAGFILE);
+	struct passwd *pw;
+	pw = getpwnam (user);
+	sprintf(tagfile,"%s/%s",pw->pw_dir,TAGFILE);
 }
 
 //----------------------------------------------------------------------------
 // pam_sm_authenticate : pam function - user authentification
 PAM_EXTERN
 int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **argv) {
-    int retval;
-    const char *service;
-    const char *user;
-    const char *tty;
+	int retval;
+	const char *service;
+	const char *user;
+	const char *tty;
 
-    char device[50];
-    
-    char stored_tag[25];
-    char *ptr;
+	char device[50];
 
-    char tag_file_path[256];
-    FILE *tagfile;
+	char stored_tag[25];
+	char *ptr;
 
-    int term_isatty;
-    struct termios term_attr;
+	char tag_file_path[256];
+	FILE *tagfile;
 
-    pthread_t prompt;
+	int term_isatty;
+	struct termios term_attr;
 
-    openlog ("[pam_mirror]", LOG_PID, LOG_AUTH);
+	pthread_t prompt;
 
-    term_isatty = isatty(STDIN_FILENO);
+	openlog ("[pam_mirror]", LOG_PID, LOG_AUTH);
 
-    //Save term Attributes
-    if (term_isatty==1) {
-       tcgetattr(STDIN_FILENO,&term_attr);
-    }
-    
-    //Get service
-    retval = pam_get_item(pamh, PAM_SERVICE, (const void **)(const void *)&service);
+	term_isatty = isatty(STDIN_FILENO);
 
-    if (retval != PAM_SUCCESS) {
-      syslog(LOG_WARNING, "Unable to retrieve the PAM service name.\n");
-      return PAM_AUTH_ERR;
-      closelog();
-    }
+	//Save term Attributes
+	if (term_isatty==1) {
+		tcgetattr(STDIN_FILENO,&term_attr);
+	}
 
-    //Get user
-    if (pam_get_user(pamh, &user, NULL) != PAM_SUCCESS || !user || !*user) {
-        syslog(LOG_WARNING, "Unable to retrieve the PAM user name.\n");
-	closelog();
-	return PAM_AUTH_ERR;
-    }
+	//Get service
+	retval = pam_get_item(pamh, PAM_SERVICE, (const void **)(const void *)&service);
 
-    syslog(LOG_WARNING,"Authentification request for user '%s' (%s)\n",user,service);
+	if (retval != PAM_SUCCESS) {
+		syslog(LOG_WARNING, "Unable to retrieve the PAM service name.\n");
+		return PAM_AUTH_ERR;
+		closelog();
+	}
 
-    //No rfid use for ssh tty
-    if (pam_get_item(pamh, PAM_TTY, (const void **)(const void *)&tty) == PAM_SUCCESS) {
-       if (tty && !strcmp(tty,"ssh")) {
-         syslog(LOG_WARNING,"Not using RFID for SSH Authentification.");
-         closelog();
-	 return PAM_AUTH_ERR;
-       }
-    }
+	//Get user
+	if (pam_get_user(pamh, &user, NULL) != PAM_SUCCESS || !user || !*user) {
+		syslog(LOG_WARNING, "Unable to retrieve the PAM user name.\n");
+		closelog();
+		return PAM_AUTH_ERR;
+	}
 
-    //User .authtag file
-    get_user_tagfile((char *)user,tag_file_path);
-    tagfile = fopen (tag_file_path,"r");
-    
-    if (tagfile==NULL) {
-      syslog(LOG_WARNING,"Unable to open rfid tag file : %s, for user : %s",tag_file_path,user);
-      closelog();
-      return PAM_SERVICE_ERR;
-    }	
-    
-    if (fgets(stored_tag,25,tagfile) == NULL) {
-      syslog(LOG_WARNING,"Unable to read rfid tag file : %s, for user : %s",tag_file_path,user);
-      closelog();
-      return PAM_SERVICE_ERR;
-    }
-    // Clean read: remove not allowed characters
-    ptr = stored_tag;
-    while (*ptr != '\0') {
+	syslog(LOG_WARNING,"Authentification request for user '%s' (%s)\n",user,service);
+
+	//No rfid use for ssh tty
+	if (pam_get_item(pamh, PAM_TTY, (const void **)(const void *)&tty) == PAM_SUCCESS) {
+		if (tty && !strcmp(tty,"ssh")) {
+			syslog(LOG_WARNING,"Not using RFID for SSH Authentification.");
+			closelog();
+			return PAM_AUTH_ERR;
+		}
+	}
+
+	//User .authtag file
+	get_user_tagfile((char *)user,tag_file_path);
+	tagfile = fopen (tag_file_path,"r");
+
+	if (tagfile==NULL) {
+		syslog(LOG_WARNING,"Unable to open rfid tag file : %s, for user : %s",tag_file_path,user);
+		closelog();
+		return PAM_SERVICE_ERR;
+	}	
+
+	if (fgets(stored_tag,25,tagfile) == NULL) {
+		syslog(LOG_WARNING,"Unable to read rfid tag file : %s, for user : %s",tag_file_path,user);
+		closelog();
+		return PAM_SERVICE_ERR;
+	}
+	// Clean read: remove not allowed characters
+	ptr = stored_tag;
+	while (*ptr != '\0') {
 		if (strchr("ABCDEF0123456789", *ptr) == NULL)
 			*ptr = '\0';
 		ptr++;
 	}
-    
-    // Compare stored tag with ztamp:s tag
-    if (check_token (stored_tag)==0) {
-	syslog(LOG_WARNING,"Authentification granted for user '%s' (%s)",user,service);
-    	closelog();
-	return PAM_SUCCESS;
-    
-    } else {
-	syslog(LOG_WARNING,"Authentification failure for user '%s' (%s)",user,service);
-	closelog();
-	
-	return PAM_AUTH_ERR;
-    }
+
+	// Compare stored tag with ztamp:s tag
+	if (check_token (stored_tag)==0) {
+		syslog(LOG_WARNING,"Authentification granted for user '%s' (%s)",user,service);
+		closelog();
+		return PAM_SUCCESS;
+
+	} else {
+		syslog(LOG_WARNING,"Authentification failure for user '%s' (%s)",user,service);
+		closelog();
+
+		return PAM_AUTH_ERR;
+	}
 
 }//pam_sm_authenticate
 
 PAM_EXTERN
 int pam_sm_setcred(pam_handle_t *pamh, int flags, int argc, const char **argv) {
-  return PAM_SUCCESS;
+	return PAM_SUCCESS;
 }
 
 PAM_EXTERN
@@ -160,8 +160,8 @@ int pam_sm_chauthok(pam_handle_t *pamh, int flags, int argc, const char **argv) 
 
 #ifdef PAM_STATIC
 struct pam_module _pam_mirror_modstruct = {
-   	"pam_mirror",
-   	pam_sm_authenticate,
+	"pam_mirror",
+	pam_sm_authenticate,
 	pam_sm_setcred,
 	NULL,
 	NULL,
