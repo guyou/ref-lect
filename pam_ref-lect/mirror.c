@@ -50,7 +50,7 @@ int check_token(char *stored_tag) {
 
 	/* Call getTags method, wait for reply */
 	error = NULL;
-	if (!dbus_g_proxy_call_with_timeout (proxy, "getTags", 1*60*1000, &error,
+	if (!dbus_g_proxy_call_with_timeout (proxy, "GetTags", 1*60*1000, &error,
 	                                     G_TYPE_INVALID,
 	                                     G_TYPE_STRV, &tags,
 	                                     G_TYPE_INVALID))
