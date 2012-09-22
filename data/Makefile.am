@@ -1,5 +1,5 @@
 man_MANS = \
-	ref-lect.1 \
+	reflectd.1 \
 	erawrim.1 \
 	erawrim-ctl.1
 

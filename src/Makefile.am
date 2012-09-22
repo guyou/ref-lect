@@ -14,17 +14,18 @@ AM_CFLAGS =\
 	 -Wall\
 	 -g
 
-bin_PROGRAMS = ref-lect
+bin_PROGRAMS = reflectd
 
-ref_lect_SOURCES = \
-	ref-lect.vala config.vapi MirrorDevice.vala mir-ror.c mir-ror.vapi
+reflectd_SOURCES = \
+	EventType.vala EventTypeParser.vala \
+	reflectd.vala config.vapi MirrorDevice.vala mir-ror.c mir-ror.vapi
 
-ref_lect_VALAFLAGS =  \
+reflectd_VALAFLAGS =  \
 	--pkg gio-2.0 --pkg gee-1.0 --pkg posix
 
-ref_lect_LDFLAGS = \
+reflectd_LDFLAGS = \
 	-Wl,--export-dynamic
 
-ref_lect_LDADD = $(REF_LECT_LIBS)
+reflectd_LDADD = $(REF_LECT_LIBS)
 
 

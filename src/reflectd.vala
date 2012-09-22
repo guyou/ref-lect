@@ -19,63 +19,94 @@
 
 using GLib;
 using Gee;
+using Mirror;
 
 [DBus (name = "org.rfid.Mirror")]
 public class MirrorServer : Object {
 
-	private uint16 state = Event.UP;
+	public string id = "<not-set>";
+	public string app_version = "<not-set>";
+	public string boot_version = "<not-set>";
+	private uint16 state = EventType.OrientationUp;
 	private HashSet<string> tagList = new HashSet<string> ();	
 
-	public string getState () {
+	public string get_id () {
+		return id;
+	}
+
+	public string get_app_version () {
+		return app_version;
+	}
+	
+	public string get_boot_version () {
+		return boot_version;
+	}
+	
+	public string get_state () {
         switch(state)
 		{
-			case Event.UP:
+			case EventType.OrientationUp:
 				return "UP";
-			case Event.DOWN:
+			case EventType.OrientationDown:
 				return "DOWN";
 			default:
 				return "UNKNOWN";
 		}
     }
 
-    public string[] getTags () {
+    public string[] get_tags () {
         return tagList.to_array ();
     }
 
-    public void resetAll () {
+    public void reset_all () {
         tagList.clear ();
     }
 
-    public signal void tagEnter (string tag);
-    public signal void tagLeave (string tag);
-    public signal void flipUp ();
-    public signal void flipDown ();
+    public signal void tag_enter (string tag);
+    public signal void tag_leave (string tag);
+    public signal void flip_up ();
+    public signal void flip_down ();
 
 	[DBus (visible = false)]
-	public void processEvent (uint16 event, ref string tag) {
+	public void processEvent (EventType event, ref string tag) {
 		switch(event)
 		{
-			case Event.UP:
+			case EventType.Unspecified:
+				break;
+			case EventType.OrientationUp:
 				stdout.printf ("DEBUG: mirror flipped up\n");
-				state = Event.UP;
-				this.flipUp ();
+				state = event;
+				this.flip_up ();
 				break;
-			case Event.DOWN:
+			case EventType.OrientationDown:
 				stdout.printf ("DEBUG: mirror flipped down\n");
-				state = Event.DOWN;
-				this.flipDown ();
+				state = event;
+				this.flip_down ();
 				break;
-			case Event.ENTER:
+			case EventType.ShowTag:
 				stdout.printf ("DEBUG: tag entered: %s\n", tag);
 				tagList.add (tag);
-				this.tagEnter (tag);
+				this.tag_enter (tag);
 				break;
-			case Event.LEAVE:
+			case EventType.HideTag:
 				stdout.printf ("DEBUG: tag left: %s\n", tag);
 				tagList.remove (tag);
-				this.tagLeave (tag);
+				this.tag_leave (tag);
+				break;
+			case EventType.MirrorId:
+				stdout.printf ("DEBUG: Mir:ror id: %s\n", tag);
+				this.id = tag;
+				break;
+			case EventType.ApplicationVersion:
+				stdout.printf ("DEBUG: Mir:ror application's version: %s\n", tag);
+				this.app_version = tag;
+				break;
+			case EventType.BootloaderVersion:
+				stdout.printf ("DEBUG: Mir:ror bootloader's version: %s\n", tag);
+				this.boot_version = tag;
 				break;
 			default:
+				stdout.printf ("DEBUG: event %s payload %s\n", event.to_string(), tag);
 				break;
 		}
 	}
@@ -98,8 +129,8 @@ async void read_async (MirrorDevice dev)
 		{
 			// FIXME break loop cleanly
 			string tag = "";
-			uint16 event = yield dev.read_event (out tag);
-			if (event != Event.EMPTY)
+			EventType event = yield dev.read_event (out tag);
+			if (event != EventType.Unspecified)
 			stdout.printf ("DEBUG: event: %d %04X\n", event, event);
 			mirror.processEvent (event, ref tag);
 		}
@@ -169,6 +200,12 @@ public class Main : Object
 		if (device != null)
 		{
 			var dev = new MirrorDevice (device);
+			// Send commands to force events
+			// This will allow to update the internal state
+			dev.write_event (EventType.GetMirrorId);
+			dev.write_event (EventType.GetOrientation);
+			dev.write_event (EventType.GetApplicationVersion);
+			dev.write_event (EventType.GetBootloaderVersion);
 			var loop = new MainLoop();
 			read_async(dev);
 			loop.run();
