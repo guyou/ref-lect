@@ -36,7 +36,7 @@
 
 #include <pwd.h>
 
-#include "check_token.h"
+#include "mirror.h"
 
 #define PAM_SM_AUTH
 

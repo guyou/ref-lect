@@ -21,13 +21,13 @@ AM_CFLAGS = -DSBINDIR=\"@sbindir@\" @PAM_MIRROR_CFLAGS@
 pamdir = @PAM_MODDIR@
 pam_LTLIBRARIES = pam_mirror.la
 
-pam_mirror_la_SOURCES = pam_mir-ror.c check_token.h check_token.c
+pam_mirror_la_SOURCES = pam_mir-ror.c mirror.h mirror.c
 pam_mirror_la_LDFLAGS = -module -avoid-version
 pam_mirror_la_LIBADD = @PAM_MIRROR_LIBS@
 pam_mirror_la_CFLAGS = $(AM_CFLAGS)
 
-check_PROGRAMS = test_check_token
+check_PROGRAMS = check_token
 
-test_check_token_SOURCES = test_check_token.c check_token.h check_token.c
-test_check_token_LDADD = @PAM_MIRROR_LIBS@
-test_check_token_CFLAGS = $(AM_CFLAGS)
+check_token_SOURCES = check_token.c mirror.h mirror.c
+check_token_LDADD = @PAM_MIRROR_LIBS@
+check_token_CFLAGS = $(AM_CFLAGS)
