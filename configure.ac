@@ -44,7 +44,7 @@ PKG_CHECK_MODULES(REF_LECT, [
 	dbus-1
 ])
 
-PKG_CHECK_MODULES(PAM_MIRROR, [
+PKG_CHECK_MODULES(PAM_REF_LECT, [
 	glib-2.0
 	dbus-1
 	dbus-glib-1

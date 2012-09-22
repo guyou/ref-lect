@@ -16,18 +16,18 @@
 # along with pam_dbus; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 
-AM_CFLAGS = -DSBINDIR=\"@sbindir@\" @PAM_MIRROR_CFLAGS@
+AM_CFLAGS = -DSBINDIR=\"@sbindir@\" @PAM_REF_LECT_CFLAGS@
 
 pamdir = @PAM_MODDIR@
 pam_LTLIBRARIES = pam_reflect.la
 
 pam_reflect_la_SOURCES = pam_ref-lect.c mirror.h mirror.c
 pam_reflect_la_LDFLAGS = -module -avoid-version
-pam_reflect_la_LIBADD = @PAM_MIRROR_LIBS@
+pam_reflect_la_LIBADD = @PAM_REF_LECT_LIBS@
 pam_reflect_la_CFLAGS = $(AM_CFLAGS)
 
 check_PROGRAMS = check_token
 
 check_token_SOURCES = check_token.c mirror.h mirror.c
-check_token_LDADD = @PAM_MIRROR_LIBS@
+check_token_LDADD = @PAM_REF_LECT_LIBS@
 check_token_CFLAGS = $(AM_CFLAGS)
