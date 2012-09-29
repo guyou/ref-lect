@@ -3,3 +3,5 @@ Makefile
 Makefile.in
 ref-lect-*.tar.gz
 */.libs
+*.lo
+*.la
