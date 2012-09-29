@@ -73,7 +73,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 
 	pthread_t prompt;
 
-	openlog ("[pam_mirror]", LOG_PID, LOG_AUTH);
+	openlog ("[pam_reflect]", LOG_PID, LOG_AUTH);
 
 	term_isatty = isatty(STDIN_FILENO);
 
@@ -158,8 +158,8 @@ int pam_sm_chauthok(pam_handle_t *pamh, int flags, int argc, const char **argv) 
 }
 
 #ifdef PAM_STATIC
-struct pam_module _pam_mirror_modstruct = {
-	"pam_mirror",
+struct pam_module _pam_reflect_modstruct = {
+	"pam_reflect",
 	pam_sm_authenticate,
 	pam_sm_setcred,
 	NULL,
