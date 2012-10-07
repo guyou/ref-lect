@@ -86,14 +86,14 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 	retval = pam_get_item(pamh, PAM_SERVICE, (const void **)(const void *)&service);
 
 	if (retval != PAM_SUCCESS) {
-		syslog(LOG_WARNING, "Unable to retrieve the PAM service name.\n");
+		syslog(LOG_WARNING, "Unable to retrieve the PAM service name.");
 		return PAM_AUTH_ERR;
 		closelog();
 	}
 
 	//Get user
 	if (pam_get_user(pamh, &user, NULL) != PAM_SUCCESS || !user || !*user) {
-		syslog(LOG_WARNING, "Unable to retrieve the PAM user name.\n");
+		syslog(LOG_WARNING, "Unable to retrieve the PAM user name.");
 		closelog();
 		return PAM_AUTH_ERR;
 	}
