@@ -25,6 +25,11 @@
 #include <dbus/dbus-glib.h>
 
 
+int wait_token(char *stored_tag, int delay) {
+	// TODO
+	return PAM_AUTH_ERR;
+}
+
 int check_token(char *stored_tag) {
 	DBusGConnection *connection;
 	GError *error;

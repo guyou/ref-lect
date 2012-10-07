@@ -41,6 +41,9 @@
 
 #define TAGFILE	".authtag"
 
+#define WAIT_KEY "wait"
+#define NOWAIT_KEY "nowait"
+
 //-----------------------------------------------------------------------------
 // get_user_tagfile : Build ~/.auth path using user name and passwd file.
 // 		      return filename with complete path.
@@ -51,11 +54,35 @@ void get_user_tagfile(char *user, char *tagfile) {
 	sprintf(tagfile,"%s/%s",pw->pw_dir,TAGFILE);
 }
 
+//
+static int _pam_parse(int argc, const char **argv)
+{
+     int wait_delay=-1;
+
+     /* step through arguments */
+     for (; argc-- > 0; ++argv) {
+
+          /* generic options */
+
+          if (!strcmp(*argv,NOWAIT_KEY))
+               wait_delay = -1;
+          else if (!strncmp(*argv,WAIT_KEY"=",sizeof(WAIT_KEY))) {
+               int glen = strlen(*argv);
+               atoi(*argv+sizeof(WAIT_KEY));
+          } else {
+               syslog(LOG_ERR,"pam_parse: unknown option; %s",*argv);
+          }
+     }
+
+     return wait_delay;
+}
+
 //----------------------------------------------------------------------------
 // pam_sm_authenticate : pam function - user authentification
 PAM_EXTERN
 int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **argv) {
 	int retval;
+	int wait_delay;
 	const char *service;
 	const char *user;
 	const char *tty;
@@ -74,6 +101,8 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 	pthread_t prompt;
 
 	openlog ("[pam_reflect]", LOG_PID, LOG_AUTH);
+
+	wait_delay = _pam_parse(argc, argv);
 
 	term_isatty = isatty(STDIN_FILENO);
 
@@ -134,6 +163,11 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 
 	// Compare stored tag with ztamp:s tag
 	if (check_token (stored_tag)==0) {
+		syslog(LOG_WARNING,"Authentification granted for user '%s' (%s)",user,service);
+		closelog();
+		return PAM_SUCCESS;
+
+	} else if (wait_token (stored_tag, wait_delay)==0) {
 		syslog(LOG_WARNING,"Authentification granted for user '%s' (%s)",user,service);
 		closelog();
 		return PAM_SUCCESS;
