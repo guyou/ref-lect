@@ -68,7 +68,7 @@ static int _pam_parse(int argc, const char **argv)
                wait_delay = -1;
           else if (!strncmp(*argv,WAIT_KEY"=",sizeof(WAIT_KEY))) {
                int glen = strlen(*argv);
-               atoi(*argv+sizeof(WAIT_KEY));
+               wait_delay = atoi(*argv+sizeof(WAIT_KEY));
           } else {
                syslog(LOG_ERR,"pam_parse: unknown option; %s",*argv);
           }
@@ -167,7 +167,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 		closelog();
 		return PAM_SUCCESS;
 
-	} else if (wait_token (stored_tag, wait_delay)==0) {
+	} else if (wait_delay > 0 && wait_token (stored_tag, wait_delay)==0) {
 		syslog(LOG_WARNING,"Authentification granted for user '%s' (%s)",user,service);
 		closelog();
 		return PAM_SUCCESS;

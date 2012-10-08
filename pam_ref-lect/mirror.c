@@ -24,10 +24,85 @@
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib.h>
 
+static gboolean tag_match;
+static char *waited_tag;
 
-int wait_token(char *stored_tag, int delay) {
-	// TODO
-	return PAM_AUTH_ERR;
+static void
+tag_enter_cb (DBusGProxy *proxy,
+		 char *tag,
+		 gpointer user_data)
+{
+	GError *error = NULL;
+	GMainLoop *mainloop = (GMainLoop *)user_data;
+
+	// 
+	if (tag != NULL && waited_tag != NULL &&
+		strcmp (tag, waited_tag) == 0) {
+		tag_match = TRUE;
+	}
+	
+	// stop mainloop
+	g_main_loop_quit (mainloop);
+
+}
+
+static gboolean
+timeout_cb (gpointer user_data)
+{
+	GMainLoop *mainloop = (GMainLoop *)user_data;
+	
+	// stop mainloop
+	if (g_main_loop_is_running (mainloop))
+		g_main_loop_quit (mainloop);
+	
+	return FALSE;
+}
+
+int wait_token(char *tag, int delay) {
+	DBusGConnection *connection;
+	GError *error;
+	DBusGProxy *proxy;
+	GMainLoop *mainloop;
+
+	g_type_init ();
+	
+	tag_match = FALSE;
+	waited_tag = tag;
+	
+	error = NULL;
+	connection = dbus_g_bus_get (DBUS_BUS_SYSTEM, &error);
+	if (connection == NULL) {
+		g_error_free (error);
+		return PAM_AUTHINFO_UNAVAIL;
+	}
+
+	mainloop = g_main_loop_new (NULL, FALSE);
+
+	/* Create a proxy object for the "bus driver" (name "org.freedesktop.DBus") */
+	proxy = dbus_g_proxy_new_for_name (connection,
+	                                   "org.rfid.Mirror",
+	                                   "/org/rfid/mirror",
+	                                   "org.rfid.Mirror"); 
+	                                   
+	/* Expect signal about tag entering */
+	dbus_g_proxy_add_signal (proxy, "TagEnter",
+				 G_TYPE_STRING,
+				 G_TYPE_INVALID);
+	dbus_g_proxy_connect_signal (proxy, "TagEnter",
+				     G_CALLBACK (tag_enter_cb),
+				     (gpointer)mainloop, NULL);
+				     
+	/* Now you can write on the xchat windows: "/test arg1 arg2 ..." */
+	g_timeout_add_seconds (delay, timeout_cb, (gpointer)mainloop);
+	g_main_loop_run (mainloop);
+
+	g_main_destroy (mainloop);
+
+
+	if (tag_match)
+		return PAM_SUCCESS;
+	else
+		return PAM_AUTH_ERR;
 }
 
 int check_token(char *stored_tag) {
