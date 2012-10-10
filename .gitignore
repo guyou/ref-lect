@@ -2,3 +2,7 @@ autom4te.cache/
 Makefile
 Makefile.in
 ref-lect-*.tar.gz
+*/.libs
+*/.deps
+*.lo
+*.la
