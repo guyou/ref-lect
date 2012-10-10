@@ -16,51 +16,79 @@ RFID USB device.
 This program must be run in interactive by user.
 .SH COMMANDS
 .B add RFID
+.RS 4
 Declares the new RFID to associate a symbolic name, and create all
 associated files (the user can then fullfill the scripts)
+.RE
 .P
 .B remove RFID
+.RS 4
 Removes the given RFID and all associated data and scripts
+.RE
 .SH FILES
 .B $HOME/.erawrim
+.RS 4
 the root database
+.RE
 .P
 .B $HOME/.erawrim/log
+.RS 4
 the log file
+.RE
 .P
 .B $HOME/.erawrim/annuaire
+.RS 4
 the aliases between RFID id and symbolic names given by user
+.RE
 .P
 .B $HOME/.erawrim/ztamps/
+.RS 4
 this directory contains the id of currently visible ztamps
+.RE
 .P
 .B $HOME/.erawrim/endroit.sh
+.RS 4
 the script called when
 .B Mir:ror
 is flipped up
+.RE
 .P
 .B $HOME/.erawrim/envers.sh
+.RS 4
 the script called when
 .B Mir:ror
 is flipped down
+.RE
 .P
 .B $HOME/.erawrim/<ztamp_alias>/pose.sh
+.RS 4
 the script called when the associated ztamp is put
+.RE
 .P
 .B $HOME/.erawrim/<ztamp_alias>/retire.sh
+.RS 4
 the script called when the associated ztamp is poped
+.RE
 .P
 .B $HOME/.erawrim/<ztamp_alias>/times
+.RS 4
 the number of times the associated ztamp was inserted
+.RE
 .P
 .B $HOME/.erawrim/<ztamp_alias>/lasttime
+.RS 4
 the timestamp of the last insertion of the associated ztamp
+.RE
 .P
 .B $HOME/.erawrim/defaut/pose.sh
+.RS 4
 the script called when an unknown ztamp is put
+.RE
 .P
 .B $HOME/.erawrim/defaut/retire.sh
+.RS 4
 the script called when an unknown ztamp is poped
+.RE
 .SH AUTHORS
 Guilhem Bonnefille  <guilhem.bonnefille@gmail.com>
 
