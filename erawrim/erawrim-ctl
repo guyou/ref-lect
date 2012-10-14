@@ -45,6 +45,22 @@ prepare_home ()
     then
 		echo "#!/bin/bash" > $ERAWRIM_PATH/defaut/retire.sh;
 		echo "# Gestionnaire par défaut lors du retrait d'un Ztamp" >> $ERAWRIM_PATH/defaut/retire.sh;
+		cat >> $ERAWRIM_PATH/defaut/retire.sh << EOF
+# Handle .authtag used by pam_reflect
+# pam_reflect allows authentication when tag is inserted,
+# and here, we manage to lock screen when tag is removed.
+if [ -r $HOME/.authtag -a "$1" = "`cat $HOME/.authtag`" ]
+then
+	# Verrouiller l'écran
+	# Fonctionne pour le bureau Gnome
+	# gnome-screensaver-command -l
+
+	# Sur bureau récent
+	# dbus-send --session --dest=org.freedesktop.ScreenSaver \
+	# --type=method_call --print-reply /ScreenSaver \
+	# org.freedesktop.ScreenSaver.Lock
+fi
+EOF
 	fi;
     
     chmod +x $ERAWRIM_PATH/defaut/pose.sh $ERAWRIM_PATH/defaut/retire.sh
