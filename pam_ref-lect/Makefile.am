@@ -21,17 +21,20 @@ AM_CFLAGS = -DSBINDIR=\"@sbindir@\" @PAM_REF_LECT_CFLAGS@
 pamdir = @PAM_MODDIR@
 pam_LTLIBRARIES = pam_reflect.la
 
-pam_reflect_la_SOURCES = pam_ref-lect.c mirror.h mirror.c
+pam_reflect_la_SOURCES = pam_ref-lect.c mirror.h mirror.c \
+        pam_utils.h pam_utils.c
 pam_reflect_la_LDFLAGS = -module -avoid-version
 pam_reflect_la_LIBADD = @PAM_REF_LECT_LIBS@
 pam_reflect_la_CFLAGS = $(AM_CFLAGS)
 
 check_PROGRAMS = check_token wait_token
 
-check_token_SOURCES = check_token.c mirror.h mirror.c
+check_token_SOURCES = check_token.c mirror.h mirror.c \
+        pam_utils.h pam_utils.c
 check_token_LDADD = @PAM_REF_LECT_LIBS@
 check_token_CFLAGS = $(AM_CFLAGS)
 
-wait_token_SOURCES = wait_token.c mirror.h mirror.c
+wait_token_SOURCES = wait_token.c mirror.h mirror.c \
+        pam_utils.h pam_utils.c
 wait_token_LDADD = @PAM_REF_LECT_LIBS@
 wait_token_CFLAGS = $(AM_CFLAGS)

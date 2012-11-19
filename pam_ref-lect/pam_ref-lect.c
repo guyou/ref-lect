@@ -36,6 +36,7 @@
 #include <pwd.h>
 
 #include "mirror.h"
+#include "pam_utils.h"
 
 #define PAM_SM_AUTH
 
@@ -43,6 +44,8 @@
 
 #define WAIT_KEY "wait"
 #define NOWAIT_KEY "nowait"
+
+#define DEBUG_KEY "debug"
 
 //-----------------------------------------------------------------------------
 // get_user_tagfile : Build ~/.auth path using user name and passwd file.
@@ -69,8 +72,12 @@ static int _pam_parse(int argc, const char **argv)
           else if (!strncmp(*argv,WAIT_KEY"=",sizeof(WAIT_KEY))) {
                int glen = strlen(*argv);
                wait_delay = atoi(*argv+sizeof(WAIT_KEY));
+          } else if (!strcmp(*argv,DEBUG_KEY)) {
+               debug = TRUE;
           } else {
+               openlog("[pam_reflect]", LOG_PID, LOG_AUTH);
                syslog(LOG_ERR,"pam_parse: unknown option; %s",*argv);
+               closelog();
           }
      }
 
@@ -100,8 +107,6 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 
 	pthread_t prompt;
 
-	openlog ("[pam_reflect]", LOG_PID, LOG_AUTH);
-
 	wait_delay = _pam_parse(argc, argv);
 
 	term_isatty = isatty(STDIN_FILENO);
@@ -115,25 +120,22 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 	retval = pam_get_item(pamh, PAM_SERVICE, (const void **)(const void *)&service);
 
 	if (retval != PAM_SUCCESS) {
-		syslog(LOG_WARNING, "Unable to retrieve the PAM service name.");
+		ERR(pamh, "Unable to retrieve the PAM service name.");
 		return PAM_AUTH_ERR;
-		closelog();
 	}
 
 	//Get user
 	if (pam_get_user(pamh, &user, NULL) != PAM_SUCCESS || !user || !*user) {
-		syslog(LOG_WARNING, "Unable to retrieve the PAM user name.");
-		closelog();
+		ERR(pamh, "Unable to retrieve the PAM user name.");
 		return PAM_AUTH_ERR;
 	}
 
-	syslog(LOG_WARNING,"Authentification request for user '%s' (%s)\n",user,service);
+	DEBUG(pamh,"Authentification request for user '%s' (%s)\n",user,service);
 
 	//No rfid use for ssh tty
 	if (pam_get_item(pamh, PAM_TTY, (const void **)(const void *)&tty) == PAM_SUCCESS) {
 		if (tty && !strcmp(tty,"ssh")) {
-			syslog(LOG_WARNING,"Not using RFID for SSH Authentification.");
-			closelog();
+			ERR(pamh,"Not using RFID for SSH Authentification.");
 			return PAM_AUTH_ERR;
 		}
 	}
@@ -143,14 +145,12 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 	tagfile = fopen (tag_file_path,"r");
 
 	if (tagfile==NULL) {
-		syslog(LOG_WARNING,"Unable to open rfid tag file : %s, for user : %s",tag_file_path,user);
-		closelog();
+		DEBUG(pamh,"Unable to open rfid tag file : %s, for user : %s",tag_file_path,user);
 		return PAM_SERVICE_ERR;
 	}	
 
 	if (fgets(stored_tag,25,tagfile) == NULL) {
-		syslog(LOG_WARNING,"Unable to read rfid tag file : %s, for user : %s",tag_file_path,user);
-		closelog();
+		DEBUG(pamh,"Unable to read rfid tag file : %s, for user : %s",tag_file_path,user);
 		return PAM_SERVICE_ERR;
 	}
 	// Clean read: remove not allowed characters
@@ -163,19 +163,15 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 
 	// Compare stored tag with ztamp:s tag
 	if (check_token (stored_tag)==0) {
-		syslog(LOG_WARNING,"Authentification granted for user '%s' (%s)",user,service);
-		closelog();
+		DEBUG(pamh,"Authentification granted for user '%s' (%s)",user,service);
 		return PAM_SUCCESS;
 
 	} else if (wait_delay > 0 && wait_token (stored_tag, wait_delay)==0) {
-		syslog(LOG_WARNING,"Authentification granted for user '%s' (%s)",user,service);
-		closelog();
+		DEBUG(pamh,"Authentification granted for user '%s' (%s)",user,service);
 		return PAM_SUCCESS;
 
 	} else {
-		syslog(LOG_WARNING,"Authentification failure for user '%s' (%s)",user,service);
-		closelog();
-
+		DEBUG(pamh,"Authentification failure for user '%s' (%s)",user,service);
 		return PAM_AUTH_ERR;
 	}
 
