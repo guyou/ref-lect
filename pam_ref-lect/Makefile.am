@@ -18,6 +18,10 @@
 
 AM_CFLAGS = -DSBINDIR=\"@sbindir@\" @PAM_REF_LECT_CFLAGS@
 
+bin_SCRIPTS = pam_reflect_enroll.sh
+
+EXTRA_DIST = $(bin_SCRIPTS)
+
 pamdir = @PAM_MODDIR@
 pam_LTLIBRARIES = pam_reflect.la
 
