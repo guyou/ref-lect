@@ -1,3 +1,6 @@
+ref-lect 0.6 (2012-11-22)
+* [PAM] Add PAM module
+
 ref-lect 0.5 (2012-08-30)
 * Integrate Mir:lite reverse engeneering
 * Fix naming conventions of D-Bus signals and methods

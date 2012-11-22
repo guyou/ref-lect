@@ -5,6 +5,7 @@ SUBDIRS = src data erawrim pam_ref-lect tools
 
 ref_lectdocdir = ${prefix}/doc/ref-lect
 ref_lectdoc_DATA = \
+	BUGS\
 	README\
 	COPYING\
 	AUTHORS\
