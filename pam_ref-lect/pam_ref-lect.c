@@ -162,11 +162,11 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **ar
 	}
 
 	// Compare stored tag with ztamp:s tag
-	if (check_token (stored_tag)==0) {
+	if (check_token (pamh, stored_tag)==0) {
 		DEBUG(pamh,"Authentification granted for user '%s' (%s)",user,service);
 		return PAM_SUCCESS;
 
-	} else if (wait_delay > 0 && wait_token (stored_tag, wait_delay)==0) {
+	} else if (wait_delay > 0 && wait_token (pamh, stored_tag, wait_delay)==0) {
 		DEBUG(pamh,"Authentification granted for user '%s' (%s)",user,service);
 		return PAM_SUCCESS;
 

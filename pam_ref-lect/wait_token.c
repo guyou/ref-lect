@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 	int delay = atoi (argv[1]);
 	int i;
 	for (i = 2 ; i < argc ; i++) {
-		printf ("check returns %d\n", wait_token (argv[i], delay));
+		printf ("check returns %d\n", wait_token (NULL, argv[i], delay));
 	}
 	return 0;
 }

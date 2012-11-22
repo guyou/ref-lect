@@ -14,5 +14,8 @@
  * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
-int wait_token(char *stored_tag, int delay);
-int check_token(char *stored_tag);
+ 
+#include <security/pam_ext.h>
+
+int wait_token(pam_handle_t *pamh, char *stored_tag, int delay);
+int check_token(pam_handle_t *pamh, char *stored_tag);
