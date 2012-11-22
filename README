@@ -19,3 +19,9 @@ for Mir:ror. These tools allow a simple management of Ztamps:
 See erawrim(1) and erawrim-ctl(1) for more informations.
 
 The directory erawrim/examples contains some example of script to use.
+
+pam_reflect
+-----------
+It is possible to use the Mir:ror and Ztamps as authentication tokens.
+Learn how to configure system with pam_reflect(8) PAM module.
+Set token with pam_reflect_enroll(1) command.
