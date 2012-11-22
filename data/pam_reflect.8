@@ -1,0 +1,53 @@
+.TH REF_LECT 1 "10 Oct 2012"
+.SH NAME
+pam_reflect\fP \- PAM module to authenticate with Mir:ror
+
+.SH SYNOPSIS
+.B pam_reflect.so
+.RI [nowait | wait=\fIdelay\fR]
+.SH DESCRIPTION
+The
+.B pam_reflect
+PAM module allows to authenticate a user using a 
+.B Mir:ror
+and a 
+.B Ztamp.
+.P
+The authentication succeed when the Ztamp is already present on the
+Mir:ror or when it is passed before the specified delay.
+.SH OPTIONS
+.PP
+.B nowait
+.RS 4
+the Ztamp should be present
+.B before
+the input of the login.
+.RE
+.PP
+\fBwait=\fR\fB\fIdelay\fR\fR
+.RS 4
+specify the delay to expect for reading new Ztamp.
+.RE
+.SH EXAMPLES
+Add the following line to /etc/pam.d/gdm3 to forward allow Mir:ror based
+authentication, with 5 seconds to present the expected tag.
+.RS 4
+auth	sufficient	pam_reflect.so wait=5
+.RE
+.SH FILES
+.B $HOME/.authtag
+.RS 4
+the file containing the Ztamp expected to open the user's session
+.RE
+.SH SEE ALSO
+.B pam.conf
+(5),
+.B pam.d
+(5),
+.B pam
+(7),
+.B reflectd
+(1)
+.SH AUTHORS
+Guilhem Bonnefille  <guilhem.bonnefille@gmail.com>
+
