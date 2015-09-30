@@ -118,7 +118,7 @@ void on_bus_aquired (DBusConnection conn) {
     try {
         conn.register_object ("/org/rfid/mirror", mirror);
     } catch (IOError e) {
-        stderr.printf ("Could not register service\n");
+        stderr.printf ("Could not register service: %s\n", e.message);
     }
 }
 
