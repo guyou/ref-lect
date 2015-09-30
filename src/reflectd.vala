@@ -176,6 +176,7 @@ public class Main : Object
 
 	static int main (string[] args) 
 	{
+	try {
 		parse_command_line(ref args);
 
 		if (quit)
@@ -213,5 +214,10 @@ public class Main : Object
 		}
 		else
 			return 1;
+	} catch (GLib.OptionError e) {
+		error(e.message);
+	} catch (GLib.Error e) {
+		error(e.message);
+	}
 	}
 }
