@@ -4,8 +4,9 @@ dnl Created by Anjuta application wizard.
 AC_INIT(ref-lect, 0.6)
 
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.11])
+AM_INIT_AUTOMAKE([dist-bzip2 dist-zip subdir-objects])
 
 AM_SILENT_RULES([yes])
 
@@ -14,9 +15,15 @@ AC_PROG_LIBTOOL
 
 LT_INIT
 
+# I18N
 GETTEXT_PACKAGE=gitg
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Gettext package])
+
+AM_GLIB_DEFINE_LOCALEDIR(LOCALEDIR)
+
+AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT([external])
 
 dnl Check for vala
 AM_PROG_VALAC([0.10.0])
