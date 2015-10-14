@@ -8,13 +8,13 @@ Messages
 Generic format
 ---
 
- Meaning      Size
------------- ------
-Interface ID 1 byte
-Method ID    1 byte
-Msg Id       2 bytes
-Len          1 byte
-Data         len * byte(s)
+ Meaning     |  Size
+:-----------:|:------:
+Interface ID | 1 byte
+Method ID    | 1 byte
+Msg Id       | 2 bytes
+Len          | 1 byte
+Data         | len * byte(s)
 
 When device has to reply to a command, Msg Id is copied from request.
 When device has to send message due to external event (flip, tag...), then Msg Id is set to zero.
